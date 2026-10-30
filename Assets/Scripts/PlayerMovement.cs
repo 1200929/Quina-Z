@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
     {
         //CURSOR NO MEIO E INVISIVEL
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        //Cursor.visible = false;
     }
 
     private void Update()
@@ -59,7 +59,7 @@ public class PlayerMovement : MonoBehaviour
     {
         float mouseX = lookInput.x * mouseSensitivity;
         float mouseY = lookInput.y * mouseSensitivity;
-        
+
         //MOVER CAMARA COM RATO
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
