@@ -22,24 +22,33 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        inputActions = new PlayerInputActions();
-
         //INPUT SYSTEM
-        inputActions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        inputActions.Player.Move.canceled += ctx => moveInput = Vector2.zero;
-
-        inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
-        inputActions.Player.Look.canceled += ctx => lookInput = Vector2.zero;
+        
     }
 
     private void OnEnable()
     {
+        // 1. Unity checks: "Does inputActions exist?"
+        if (inputActions == null)
+        {
+            inputActions = new PlayerInputActions();
+
+            inputActions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+            inputActions.Player.Move.canceled += ctx => moveInput = Vector2.zero;
+
+            inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
+            inputActions.Player.Look.canceled += ctx => lookInput = Vector2.zero;
+        }
+
         inputActions.Player.Enable();
     }
 
     private void OnDisable()
     {
-        inputActions.Player.Disable();
+        if (inputActions != null)
+        {
+            inputActions.Player.Disable();
+        }
     }
 
     private void Start()
