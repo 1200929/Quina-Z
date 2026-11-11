@@ -24,7 +24,7 @@ public class ZombieHealth : MonoBehaviour, IDamageable
     public float maxHealth = 100f;
 
     [Header("Hit zones (matched against the name of the collider that was hit)")]
-    public string headName = "head";
+    public string headName = "spine.005";
     public float headMultiplier = 2.5f;
 
     [Header("Layers (leave a name empty to skip that step)")]

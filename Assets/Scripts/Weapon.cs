@@ -245,6 +245,8 @@ public class Weapon : MonoBehaviour
 
     private void ApplyHit(RaycastHit hit, Vector3 dir)
     {
+        //Debug.Log("Weapon raycast struck: " + hit.collider.name);
+
         IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
 
         if (target != null)

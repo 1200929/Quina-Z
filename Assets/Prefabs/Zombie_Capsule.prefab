@@ -129,7 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieHealth
   maxHealth: 100
-  headName: head
+  headName: spine.005
   headMultiplier: 2.5
   hitboxLayerName: ZombieHitbox
   corpseLayerName: Corpse
