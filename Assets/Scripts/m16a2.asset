@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1763c8724f4728244835d96161609af3, type: 3}
+  m_Name: m16a2
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: Weapon
+  weaponType: 0
+  damage: 30
+  pellets: 1
+  range: 500
+  damageAtMaxRange: 0.7
+  falloffStartDistance: 35
+  impactForce: 225
+  fireMode: 2
+  fireRate: 800
+  burstCount: 3
+  burstCooldown: 0.25
+  magazineSize: 30
+  spareMagazines: 5
+  maxSpareMagazines: 8
+  reloadTime: 1.8
+  spreadStationary: 0.18
+  spreadMoving: 1.9
+  accuracyTransitionTime: 0.35
+  bloomPerShot: 0.28
+  maxBloom: 2.4
+  bloomRecovery: 8
+  movementSpeedMultiplier: 0.95
+  meleeRadius: 0.4
+  fireSound: {fileID: 0}
+  reloadSound: {fileID: 0}
+  emptySound: {fileID: 0}

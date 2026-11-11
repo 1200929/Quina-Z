@@ -44,9 +44,9 @@ public class ZombieHealth : MonoBehaviour, IDamageable
     [Tooltip("Scales the push from the bullet on the ragdoll.")]
     public float deathForceMultiplier = 1f;
     [Tooltip("Hard limit (m/s) for the push on the body, so shots never launch it.")]
-    public float maxPushSpeed = 4f;
+    public float maxPushSpeed = 15f;
     [Tooltip("Limits how much of the push can go upwards (0 = none, 1 = unlimited).")]
-    [Range(0f, 1f)] public float maxUpwardPush = 0.2f;
+    [Range(0f, 1f)] public float maxUpwardPush = 1f;
 
     public float CurrentHealth { get; private set; }
     public bool IsDead { get; private set; }
@@ -195,11 +195,12 @@ public class ZombieHealth : MonoBehaviour, IDamageable
         if (push.sqrMagnitude < 0.0001f) return;
 
         // Speed from the impulse, but capped so light bones (the head) never get launched
-        float speed = Mathf.Min(push.magnitude / hitBody.mass, maxPushSpeed);
+        //float speed = Mathf.Min(push.magnitude / hitBody.mass, maxPushSpeed);
+        float speed = push.magnitude / hitBody.mass;
 
         Vector3 dir = push.normalized;
-        dir.y = Mathf.Clamp(dir.y, -maxUpwardPush, maxUpwardPush);
-        dir.Normalize();
+        //dir.y = Mathf.Clamp(dir.y, -maxUpwardPush, maxUpwardPush);
+        //dir.Normalize();
 
         hitBody.AddForce(dir * speed, ForceMode.VelocityChange);
     }

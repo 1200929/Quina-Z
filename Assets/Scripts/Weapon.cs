@@ -139,16 +139,27 @@ public class Weapon : MonoBehaviour
             return;
         }
 
+
+        //only 1 shot left in magazine, fire then reload
+        if (AmmoInMagazine == 1)
+        {
+            FireShot();
+            TryReload();    // auto reload when empty
+            return;
+        }
+
+        //no ammo left in magazine
         if (AmmoInMagazine <= 0)
         {
             PlaySound(data.emptySound);
             nextFireTime = Time.time + 0.25f;
-            TryReload(); // auto reload when empty
+            TryReload();    //auto reload when empty
             return;
         }
 
         nextFireTime = Time.time + data.SecondsBetweenShots;
 
+        //burst firemode uses its own code
         if (data.fireMode == FireMode.Burst)
             StartCoroutine(BurstRoutine());
         else
@@ -160,13 +171,21 @@ public class Weapon : MonoBehaviour
         isBursting = true;
         for (int i = 0; i < data.burstCount; i++)
         {
-            if (AmmoInMagazine <= 0) break;
             FireShot();
+
+            if (AmmoInMagazine <= 0)
+                break;
+
             if (i < data.burstCount - 1)
                 yield return new WaitForSeconds(data.SecondsBetweenShots);
         }
         nextFireTime = Time.time + data.burstCooldown;
         isBursting = false;
+
+        if (AmmoInMagazine <= 0)
+        {
+            TryReload();    //auto reload when empty
+        }
     }
 
     private void FireShot()

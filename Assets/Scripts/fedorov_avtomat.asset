@@ -19,7 +19,7 @@ MonoBehaviour:
   range: 500
   damageAtMaxRange: 0.7
   falloffStartDistance: 35
-  impactForce: 18
+  impactForce: 150
   fireMode: 1
   fireRate: 600
   burstCount: 3

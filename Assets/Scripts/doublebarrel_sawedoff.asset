@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1763c8724f4728244835d96161609af3, type: 3}
+  m_Name: doublebarrel_sawedoff
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponData
+  weaponName: Weapon
+  weaponType: 0
+  damage: 18
+  pellets: 16
+  range: 200
+  damageAtMaxRange: 0.45
+  falloffStartDistance: 15
+  impactForce: 500
+  fireMode: 0
+  fireRate: 600
+  burstCount: 3
+  burstCooldown: 0.25
+  magazineSize: 2
+  spareMagazines: 20
+  maxSpareMagazines: 26
+  reloadTime: 3
+  spreadStationary: 20
+  spreadMoving: 50
+  accuracyTransitionTime: 0.1
+  bloomPerShot: 2
+  maxBloom: 4
+  bloomRecovery: 10
+  movementSpeedMultiplier: 1
+  meleeRadius: 0.4
+  fireSound: {fileID: 0}
+  reloadSound: {fileID: 0}
+  emptySound: {fileID: 0}
