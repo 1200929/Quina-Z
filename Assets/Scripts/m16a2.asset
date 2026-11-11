@@ -36,6 +36,6 @@ MonoBehaviour:
   bloomRecovery: 8
   movementSpeedMultiplier: 0.95
   meleeRadius: 0.4
-  fireSound: {fileID: 0}
-  reloadSound: {fileID: 0}
+  fireSound: {fileID: 8300000, guid: 79b8c218d22fc34449375b45bdeb93a1, type: 3}
+  reloadSound: {fileID: 8300000, guid: e264f9bbf130e5c4da9dea6db69ac55b, type: 3}
   emptySound: {fileID: 0}
