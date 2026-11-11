@@ -14,27 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Weapon
   weaponType: 0
-  damage: 25
+  damage: 34
   pellets: 1
-  range: 100
-  damageAtMaxRange: 0.6
-  falloffStartDistance: 30
-  impactForce: 12
+  range: 500
+  damageAtMaxRange: 0.7
+  falloffStartDistance: 35
+  impactForce: 18
   fireMode: 1
   fireRate: 600
   burstCount: 3
   burstCooldown: 0.25
-  magazineSize: 30
+  magazineSize: 25
   spareMagazines: 5
   maxSpareMagazines: 8
-  reloadTime: 2.2
-  spreadStationary: 0.5
-  spreadMoving: 3.5
-  accuracyTransitionTime: 0.15
-  bloomPerShot: 0.3
-  maxBloom: 3
-  bloomRecovery: 6
-  movementSpeedMultiplier: 1
+  reloadTime: 2.5
+  spreadStationary: 0.3
+  spreadMoving: 2.6
+  accuracyTransitionTime: 0.25
+  bloomPerShot: 0.22
+  maxBloom: 3.2
+  bloomRecovery: 7.5
+  movementSpeedMultiplier: 0.85
   meleeRadius: 0.4
   fireSound: {fileID: 0}
   reloadSound: {fileID: 0}
