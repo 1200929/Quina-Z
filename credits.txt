@@ -1,0 +1,17 @@
+//sounds
+	//weapons
+		//rifles
+			//fedorov_avtomat
+				//fire
+					The SFX kit
+				//reload
+					The SFX kit
+			//m16a2
+				//fire
+					An AK-47 being shot // has distinctive metallic kalashnikov-esque report by serøutōnin--deprivəd -- https://freesound.org/s/855841/ -- License: Creative Commons 0
+				//reload
+					m4a1 or m16 reload sound.mp3 by GFL7 -- https://freesound.org/s/276964/ -- License: Creative Commons 0
+		//shotguns
+			//doublebarrel_sawedoff
+				shotgun reload - Royalty Free Sound Effects Archive GameAudioGDC
+				Shotgun Fire by hyperix6 -- https://freesound.org/s/660299/ -- License: Creative Commons 0

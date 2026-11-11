@@ -27,14 +27,14 @@ MonoBehaviour:
   magazineSize: 25
   spareMagazines: 5
   maxSpareMagazines: 8
-  reloadTime: 2.5
+  reloadTime: 1.95
   spreadStationary: 0.3
   spreadMoving: 2.6
   accuracyTransitionTime: 0.25
   bloomPerShot: 0.22
   maxBloom: 3.2
   bloomRecovery: 7.5
-  movementSpeedMultiplier: 0.85
+  movementSpeedMultiplier: 0.9
   meleeRadius: 0.4
   fireSound: {fileID: 8300000, guid: dee5c1832d796e04aaaf4b02ff24182e, type: 3}
   reloadSound: {fileID: 8300000, guid: 270677dcbe1270d4e85490eb5e8a852a, type: 3}

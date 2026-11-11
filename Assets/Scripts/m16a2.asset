@@ -27,7 +27,7 @@ MonoBehaviour:
   magazineSize: 30
   spareMagazines: 5
   maxSpareMagazines: 8
-  reloadTime: 1.8
+  reloadTime: 3.1
   spreadStationary: 0.18
   spreadMoving: 1.9
   accuracyTransitionTime: 0.35

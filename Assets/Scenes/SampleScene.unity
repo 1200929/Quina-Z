@@ -197,6 +197,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4334808552682291568, guid: 33b3db47e613a1a4ea8105e403f442bd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 429637255}
+    - targetCorrespondingSourceObject: {fileID: 4334808552682291568, guid: 33b3db47e613a1a4ea8105e403f442bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1953983174}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 33b3db47e613a1a4ea8105e403f442bd, type: 3}
 --- !u!1 &95933140
@@ -535,7 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ac1f0a5a50e28449890eacb1786b1e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
-  data: {fileID: 11400000, guid: 0405f715f0ae0044fa26800d903cee7e, type: 2}
+  data: {fileID: 11400000, guid: db5712ba4fe85c040ba8b95d9abd7927, type: 2}
   aimOrigin: {fileID: 0}
   ignoreRoot: {fileID: 0}
   audioSource: {fileID: 1953983173}
@@ -1853,12 +1856,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1953983172}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 63.29406, y: -0, z: -101.00154}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1437814363}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1957889513
 PrefabInstance:
@@ -2302,4 +2305,3 @@ SceneRoots:
   - {fileID: 518233218}
   - {fileID: 1344343109}
   - {fileID: 1259426655}
-  - {fileID: 1953983174}
