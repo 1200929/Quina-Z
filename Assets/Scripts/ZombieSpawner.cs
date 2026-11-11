@@ -35,14 +35,14 @@ public class ZombieSpawner : MonoBehaviour
         activeZombies.RemoveAll(z => z == null);
 
         // ISTO E TEMPORARIO PARA TESTAR AS RONDAS (MATAR ZOMBIES SO A CLICAR NO K)
-        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.kKey.wasPressedThisFrame)
-        {
-            if (activeZombies.Count > 0)
-            {
-                GameObject zombieToKill = activeZombies.Find(z => z != null);
-                if (zombieToKill != null) Destroy(zombieToKill);
-            }
-        }
+        //if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.kKey.wasPressedThisFrame)
+        //{
+        //    if (activeZombies.Count > 0)
+        //    {
+        //       GameObject zombieToKill = activeZombies.Find(z => z != null);
+        //        if (zombieToKill != null) Destroy(zombieToKill);
+        //    }
+        //}
         // ------------------------------------------------
 
         // Start next wave if current one is completely clear
@@ -67,6 +67,13 @@ public class ZombieSpawner : MonoBehaviour
     IEnumerator StartNextWave()
     {
         isWaitingForNextWave = true;
+
+        PlayerPoints[] allPlayers = FindObjectsByType<PlayerPoints>(FindObjectsInactive.Exclude);
+        foreach (PlayerPoints player in allPlayers)
+        {
+            player.CommitPoints();
+        }
+
         currentWave++;
         
         // UPDATE GUI TEXT

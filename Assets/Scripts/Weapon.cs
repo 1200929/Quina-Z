@@ -84,7 +84,6 @@ public class Weapon : MonoBehaviour
         OnAmmoChanged?.Invoke();
     }
 
-    /// <summary>Call from ammo pickups / wall buys. Returns true if any ammo was added.</summary>
     public bool AddAmmo(int magazines)
     {
         int max = data.maxSpareMagazines * data.magazineSize;
@@ -195,7 +194,7 @@ public class Weapon : MonoBehaviour
         for (int i = 0; i < Mathf.Max(1, data.pellets); i++)
             FireRay(CurrentSpread);
 
-        // Bloom: every shot makes the next one less accurate
+        // Every shot makes the next one less accurate (recoil or bloom) 
         bloom = Mathf.Min(data.maxBloom, bloom + data.bloomPerShot);
 
         PlaySound(data.fireSound);

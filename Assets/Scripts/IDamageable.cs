@@ -5,24 +5,22 @@ using UnityEngine;
 /// </summary>
 public struct DamageInfo
 {
-    /// <summary>Base damage after range falloff. Hit-zone multipliers (headshots etc.) are up to the receiver.</summary>
+    /// Base damage after range falloff. Hit-zone multipliers (headshots etc.) are up to the receiver
     public float damage;
-    /// <summary>World position of the impact.</summary>
+    // World position of the impact.
     public Vector3 point;
-    /// <summary>Direction the shot was travelling (normalized).</summary>
+    // Direction the shot was travelling (normalized).
     public Vector3 direction;
-    /// <summary>Impulse the weapon wants applied (direction * impactForce), e.g. for ragdolls.</summary>
+    // Impulse the weapon wants applied (direction * impactForce), used in ragdolls for now.
     public Vector3 force;
-    /// <summary>The exact collider that was hit (use it to work out head/torso/limb).</summary>
+    // The exact collider that was hit (use it to work out head/torso/limb).
     public Collider collider;
-    /// <summary>The weapon that fired.</summary>
+    // The weapon that fired.
     public Weapon source;
 }
 
-/// <summary>
-/// Implement this on anything that can be shot (zombies, props, barricades...).
-/// The Weapon looks for it on the hit collider or its parents.
-/// </summary>
+
+// Anything that can be shot is included in this interface.
 public interface IDamageable
 {
     void TakeDamage(DamageInfo info);

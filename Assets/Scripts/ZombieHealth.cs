@@ -27,6 +27,12 @@ public class ZombieHealth : MonoBehaviour, IDamageable
     public string headName = "spine.005";
     public float headMultiplier = 2.5f;
 
+    [Header("Points System")]
+    public int headPoints = 50;
+    public int legPoints = 20;
+    public int torsoPoints = 10;
+    public int killBonus = 90;
+
     [Header("Layers (leave a name empty to skip that step)")]
     [Tooltip("Layer for the bone colliders while the zombie is alive.")]
     public string hitboxLayerName = "ZombieHitbox";
@@ -79,7 +85,7 @@ public class ZombieHealth : MonoBehaviour, IDamageable
         int corpseLayer = GetLayer(corpseLayerName);
         int playerLayer = GetLayer(playerLayerName);
 
-        // Player walks through living bone colliders and through ragdolls
+        // Player walks through living bone colliders and through ragdolls (maybe to be changed later)
         if (playerLayer >= 0)
         {
             if (hitboxLayer >= 0) Physics.IgnoreLayerCollision(hitboxLayer, playerLayer, true);
@@ -94,7 +100,7 @@ public class ZombieHealth : MonoBehaviour, IDamageable
                     col.gameObject.layer = hitboxLayer;
         }
 
-        // Root capsule: blocks the player, but raycasts pass through it
+        // Blocks the player, but raycasts pass through it
         if (rootIgnoresShots)
             gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
     }
@@ -108,7 +114,7 @@ public class ZombieHealth : MonoBehaviour, IDamageable
         return layer;
     }
 
-    // Called by Weapon when a shot (or melee hit) lands on this zombie.
+    // Called by Weapon when a shot lands on this zombie (info).
     public void TakeDamage(DamageInfo info)
     {
         if (IsDead) return;
@@ -116,6 +122,17 @@ public class ZombieHealth : MonoBehaviour, IDamageable
         float multiplier = IsHead(info.collider) ? headMultiplier : 1f;
         CurrentHealth -= info.damage * multiplier;
 
+        int pointsEarned = torsoPoints; // Default for now, any part that is not the legs or head is considered the torso for testing purposes.
+        if (IsHead(info.collider)) pointsEarned = headPoints;
+        else if (IsLeg(info.collider)) pointsEarned = legPoints;
+
+        if (CurrentHealth <= 0f) pointsEarned += killBonus; // 
+
+        if (info.source != null)
+        {
+            PlayerPoints player = info.source.GetComponentInParent<PlayerPoints>();
+            if (player != null) player.AddPoints(pointsEarned);
+        }
         if (CurrentHealth <= 0f) Die(info);
     }
 
@@ -129,6 +146,13 @@ public class ZombieHealth : MonoBehaviour, IDamageable
     private bool IsHead(Collider col)
     {
         return col != null && col.name.ToLowerInvariant().Contains(headName.ToLowerInvariant());
+    }
+
+    private bool IsLeg(Collider col)
+    {
+        if (col == null) return false;
+        string n = col.name.ToLowerInvariant();
+        return n.Contains("leg") || n.Contains("shin") || n.Contains("thigh") || n.Contains("calf");
     }
 
     private void Die(DamageInfo info)
