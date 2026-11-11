@@ -9,32 +9,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ca2dd3baa100494e88f3c5c612fc116, type: 3}
+  m_Script: {fileID: 11500000, guid: 1763c8724f4728244835d96161609af3, type: 3}
   m_Name: fedorov_avtomat
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Weapon
   weaponType: 0
-  damage: 34
+  damage: 25
   pellets: 1
-  range: 500
-  damageAtMaxRange: 0.7
-  falloffStartDistance: 35
-  impactForce: 18
+  range: 100
+  damageAtMaxRange: 0.6
+  falloffStartDistance: 30
+  impactForce: 12
   fireMode: 1
   fireRate: 600
   burstCount: 3
   burstCooldown: 0.25
-  magazineSize: 25
+  magazineSize: 30
   spareMagazines: 5
   maxSpareMagazines: 8
-  reloadTime: 2.5
-  spreadStationary: 0.3
-  spreadMoving: 2.6
-  accuracyTransitionTime: 0.25
-  bloomPerShot: 0.22
-  maxBloom: 3.2
-  bloomRecovery: 7.5
-  movementSpeedMultiplier: 0.85
+  reloadTime: 2.2
+  spreadStationary: 0.5
+  spreadMoving: 3.5
+  accuracyTransitionTime: 0.15
+  bloomPerShot: 0.3
+  maxBloom: 3
+  bloomRecovery: 6
+  movementSpeedMultiplier: 1
   meleeRadius: 0.4
   fireSound: {fileID: 0}
   reloadSound: {fileID: 0}
