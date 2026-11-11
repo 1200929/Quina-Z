@@ -8,7 +8,7 @@ public enum FireMode { SemiAuto, FullAuto, Burst }
 /// Right click in Project > Create > Weapons > Weapon Data
 /// The same Weapon script reads these, so every gun/knife shares the same code.
 /// </summary>
-[CreateAssetMenu(fileName = "NewWeapon", menuName = "Weapons/Weapon Data")]
+[CreateAssetMenu(fileName = "NewWeapon", menuName = "Weapons/WeaponData")]
 public class WeaponData : ScriptableObject
 {
     [Header("General")]
