@@ -1,3 +1,8 @@
+//models
+	//zombie_moor
+		//animations
+			//run
+				https://www.mixamo.com/#/?page=1&query=ZOMBIE:~:text=Zombie%20Running
 //sounds
 	//weapons
 		//rifles
