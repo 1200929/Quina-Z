@@ -6,8 +6,9 @@ using UnityEngine.AI;
 /// Simple zombie health. Implements IDamageable so Weapon can shoot it.
 /// Put this on the zombie ROOT (same object as the NavMeshAgent).
 ///
-/// On death the zombie's model is detached from the root and left as a ragdoll corpse,
-/// and the root is destroyed immediately, so anything that counts zombies by
+/// Multiplayer: only the server applies damage and decides when the zombie dies.
+/// On death the server tells every player (DieClientRpc) to turn the zombie model into a
+/// ragdoll corpse, then despawns the root, so anything that counts zombies by
 /// "does the object still exist" (like the wave spawner) sees it as dead right away.
 ///
 /// Requires a ragdoll: select the zombie model and use GameObject > 3D Object > Ragdoll...
@@ -115,7 +116,7 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
         return layer;
     }
 
-    // Called by Weapon when a shot lands on this zombie (info).
+    // Called by Weapon when a shot lands on this zombie (info). Only the server applies damage.
     public void TakeDamage(DamageInfo info)
     {
         if (!IsServer) return;
@@ -128,7 +129,7 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
         if (IsHead(info.collider)) pointsEarned = headPoints;
         else if (IsLeg(info.collider)) pointsEarned = legPoints;
 
-        if (CurrentHealth <= 0f) pointsEarned += killBonus; // 
+        if (CurrentHealth <= 0f) pointsEarned += killBonus;
 
         if (info.source != null)
         {
@@ -157,14 +158,28 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
         return n.Contains("leg") || n.Contains("shin") || n.Contains("thigh") || n.Contains("calf");
     }
 
+    // Runs on the server: tells everyone to show the ragdoll, then removes the zombie
     private void Die(DamageInfo info)
+    {
+        IsDead = true;
+
+        string hitBone = info.collider != null ? info.collider.name : "";
+        DieClientRpc(hitBone, info.force);   // ragdoll on every player (host included)
+
+        // Root is gone -> the wave spawner counts this zombie as dead
+        NetworkObject.Despawn();
+    }
+
+    // Runs on EVERY machine: turns the zombie model into a ragdoll corpse
+    [Rpc(SendTo.ClientsAndHost)]
+    private void DieClientRpc(string hitBoneName, Vector3 force)
     {
         IsDead = true;
 
         // Stop the zombie acting alive
         foreach (var script in GetComponents<MonoBehaviour>())
-        if (script != this && !(script is NetworkObject))
-        script.enabled = false;
+            if (script != this && !(script is NetworkObject))
+                script.enabled = false;
 
         var agent = GetComponent<NavMeshAgent>();
         if (agent != null) agent.enabled = false;
@@ -177,14 +192,10 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
         foreach (var col in GetComponents<Collider>())
             col.enabled = false;
 
-        // No ragdoll set up: nothing to leave behind, just remove the zombie
-        if (ragdollBodies.Length == 0)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        // No ragdoll set up: nothing to leave behind (the server removes the root)
+        if (ragdollBodies.Length == 0) return;
 
-        // Detach the model(s) from the root so they survive when the root is destroyed
+        // Detach the model(s) from the root so they survive when the root is removed
         var corpseParts = new System.Collections.Generic.List<Transform>();
         foreach (Transform child in transform)
             corpseParts.Add(child);
@@ -205,30 +216,23 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
             rb.maxDepenetrationVelocity = 1.5f;
         }
 
-        PushBody(info);
-
-        // Root is gone immediately -> the wave spawner counts this zombie as dead
-        Destroy(gameObject);
+        PushBody(hitBoneName, force);
     }
 
-    private void PushBody(DamageInfo info)
+    private void PushBody(string hitBoneName, Vector3 force)
     {
-        if (info.collider == null) return;
-
-        Rigidbody hitBody = info.collider.attachedRigidbody;
+        // Colliders can't be sent over the network, so find the bone by name
+        Rigidbody hitBody = null;
+        foreach (var rb in ragdollBodies)
+        {
+            if (rb.name == hitBoneName) { hitBody = rb; break; }
+        }
         if (hitBody == null || hitBody.isKinematic) return;
 
-        Vector3 push = info.force * deathForceMultiplier;
+        Vector3 push = force * deathForceMultiplier;
         if (push.sqrMagnitude < 0.0001f) return;
 
-        // Speed from the impulse, but capped so light bones (the head) never get launched
-        //float speed = Mathf.Min(push.magnitude / hitBody.mass, maxPushSpeed);
         float speed = push.magnitude / hitBody.mass;
-
-        Vector3 dir = push.normalized;
-        //dir.y = Mathf.Clamp(dir.y, -maxUpwardPush, maxUpwardPush);
-        //dir.Normalize();
-
-        hitBody.AddForce(dir * speed, ForceMode.VelocityChange);
+        hitBody.AddForce(push.normalized * speed, ForceMode.VelocityChange);
     }
 }
