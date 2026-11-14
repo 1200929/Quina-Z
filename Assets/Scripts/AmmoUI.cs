@@ -18,9 +18,20 @@ public class AmmoHUD : MonoBehaviour
         if (weapon != null) weapon.OnAmmoChanged -= Refresh;
     }
 
+    // Chamado quando o jogador local é criado
+    public void SetWeapon(Weapon newWeapon)
+    {
+        if (weapon != null) weapon.OnAmmoChanged -= Refresh;
+        weapon = newWeapon;
+        if (weapon != null)
+        {
+            weapon.OnAmmoChanged += Refresh;
+            Refresh();
+        }
+    }
+
     private void Refresh()
     {
-        //"bullets in mag / spare bullets", for example "30 / 150"
         ammoText.text = weapon.AmmoInMagazine + " / " + weapon.ReserveAmmo;
     }
 }

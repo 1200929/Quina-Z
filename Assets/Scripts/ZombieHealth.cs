@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,7 +19,7 @@ using UnityEngine.AI;
 ///   Player       : put the player (and its children) on this layer
 /// The script makes ZombieHitbox and Corpse ignore Player by itself.
 /// </summary>
-public class ZombieHealth : MonoBehaviour, IDamageable
+public class ZombieHealth : NetworkBehaviour, IDamageable
 {
     [Header("Health")]
     public float maxHealth = 100f;
@@ -117,6 +118,7 @@ public class ZombieHealth : MonoBehaviour, IDamageable
     // Called by Weapon when a shot lands on this zombie (info).
     public void TakeDamage(DamageInfo info)
     {
+        if (!IsServer) return;
         if (IsDead) return;
 
         float multiplier = IsHead(info.collider) ? headMultiplier : 1f;
@@ -161,7 +163,8 @@ public class ZombieHealth : MonoBehaviour, IDamageable
 
         // Stop the zombie acting alive
         foreach (var script in GetComponents<MonoBehaviour>())
-            if (script != this) script.enabled = false;
+        if (script != this && !(script is NetworkObject))
+        script.enabled = false;
 
         var agent = GetComponent<NavMeshAgent>();
         if (agent != null) agent.enabled = false;

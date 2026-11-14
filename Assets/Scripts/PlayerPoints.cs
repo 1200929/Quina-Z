@@ -28,6 +28,13 @@ public class PlayerPoints : MonoBehaviour
             UpdateUI();
         }
     }
+
+    public void SetText(TextMeshProUGUI text)
+    {
+        pointsText = text;
+        UpdateUI();
+    }
+    
     private void UpdateUI()
     {
         if (pointsText != null) 

@@ -1,8 +1,9 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     private CharacterController controller;
     private PlayerInputActions inputActions;
@@ -49,6 +50,21 @@ public class PlayerMovement : MonoBehaviour
         {
             inputActions.Player.Disable();
         }
+    }
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner) return;
+
+        // Este jogador pertence a outra pessoa: sem input, sem câmara, sem arma
+        enabled = false;
+        GetComponent<CharacterController>().enabled = false;
+        playerCamera.GetComponent<Camera>().enabled = false;
+
+        var listener = playerCamera.GetComponent<AudioListener>();
+        if (listener != null) listener.enabled = false;
+
+        var weapon = GetComponentInChildren<Weapon>();
+        if (weapon != null) weapon.enabled = false;
     }
 
     private void Start()

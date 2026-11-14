@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,7 +14,7 @@ using UnityEngine.InputSystem;
 ///   - Targets: implement IDamageable on anything that can be shot.
 ///   - HUD/FX: subscribe to the On... events.
 /// </summary>
-public class Weapon : MonoBehaviour
+public class Weapon : NetworkBehaviour
 {
     [Header("References")]
     public WeaponData data;
@@ -207,15 +208,22 @@ public class Weapon : MonoBehaviour
         Vector3 origin = aimOrigin.position;
         Vector3 dir = ApplySpread(aimOrigin, spreadDegrees);
 
-        if (TryGetHit(origin, dir, data.range, 0f, out RaycastHit hit))
-        {
-            Debug.DrawLine(origin, hit.point, Color.red, 0.5f);
-            ApplyHit(hit, dir);
-        }
+        if (IsServer)
+            ServerFire(origin, dir);      // o host aplica logo
         else
-        {
-            Debug.DrawRay(origin, dir * data.range, Color.yellow, 0.5f);
-        }
+            FireServerRpc(origin, dir);   // o cliente pede ao host
+    }
+
+    [Rpc(SendTo.Server)]
+    private void FireServerRpc(Vector3 origin, Vector3 dir)
+    {
+        ServerFire(origin, dir);
+    }
+
+    private void ServerFire(Vector3 origin, Vector3 dir)
+    {
+        if (TryGetHit(origin, dir, data.range, 0f, out RaycastHit hit))
+            ApplyHit(hit, dir);
     }
 
     private static Vector3 ApplySpread(Transform t, float degrees)
