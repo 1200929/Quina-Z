@@ -1,28 +1,56 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ZombieAI : MonoBehaviour
+public class ZombieAI : NetworkBehaviour
 {
-    private Transform player;
     private NavMeshAgent agent;
+    private Transform target;
+    private float nextRetarget;
 
-    void Start()
+    public override void OnNetworkSpawn()
     {
         agent = GetComponent<NavMeshAgent>();
 
-        //ENCONTRA PELA TAG "Player" NO NOME DO OBJETO
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
+        if (!IsServer)
         {
-            player = playerObj.transform;
+            // nos clientes quem move o zombie é o NetworkTransform
+            agent.enabled = false;
+            enabled = false;
         }
     }
 
     void Update()
     {
-        if (player != null)
+        if (agent == null || !agent.enabled) return;
+
+        // escolhe o jogador mais próximo, 2 vezes por segundo
+        if (Time.time >= nextRetarget)
         {
-            agent.SetDestination(player.position);
+            target = FindClosestPlayer();
+            nextRetarget = Time.time + 0.5f;
         }
+
+        if (target != null) agent.SetDestination(target.position);
+    }
+
+    private Transform FindClosestPlayer()
+    {
+        Transform best = null;
+        float bestDist = float.MaxValue;
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            var obj = client.PlayerObject;
+            if (obj == null) continue;
+
+            float d = (obj.transform.position - transform.position).sqrMagnitude;
+            if (d < bestDist)
+            {
+                bestDist = d;
+                best = obj.transform;
+            }
+        }
+        return best;
     }
 }
