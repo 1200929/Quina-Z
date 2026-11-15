@@ -5,6 +5,7 @@ public class AmmoHUD : MonoBehaviour
 {
     public Weapon weapon;
     public TextMeshProUGUI ammoText;
+    public TextMeshProUGUI weaponNameText;
 
     private void OnEnable()
     {
@@ -32,6 +33,13 @@ public class AmmoHUD : MonoBehaviour
 
     private void Refresh()
     {
+        if (weapon == null || weapon.data == null) return;
+        
         ammoText.text = weapon.AmmoInMagazine + " / " + weapon.ReserveAmmo;
+
+        if (weaponNameText != null)
+        {
+            weaponNameText.text = weapon.data.weaponName;
+        }
     }
 }

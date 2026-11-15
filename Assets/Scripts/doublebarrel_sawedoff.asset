@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1763c8724f4728244835d96161609af3, type: 3}
   m_Name: doublebarrel_sawedoff
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Weapon
+  weaponName: DoubleBarrel SawedOff
   weaponType: 0
   damage: 18
   pellets: 16
