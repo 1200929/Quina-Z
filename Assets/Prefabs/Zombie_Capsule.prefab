@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 7012703145636173595}
   - component: {fileID: 8824894568391791176}
   - component: {fileID: 1144488690572359701}
+  - component: {fileID: 6173173794136255366}
   - component: {fileID: 4850969630466885405}
   - component: {fileID: -1410936254562854773}
   - component: {fileID: 3927389486907564113}
-  - component: {fileID: 6173173794136255366}
   - component: {fileID: 3856297020321404191}
   m_Layer: 0
   m_Name: Zombie_Capsule
@@ -84,6 +84,33 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &6173173794136255366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4559668279591376524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1842138678
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  m_InScenePlacedDisabledByDefault: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &4850969630466885405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96,6 +123,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1b0ebc34c9f6564baf12b8d82f8a9c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieAI
+  ShowTopMostFoldoutHeaderGroup: 1
+  attackDamage: 30
+  attackRange: 2
+  attackCooldown: 1.5
 --- !u!95 &-1410936254562854773
 Animator:
   serializedVersion: 7
@@ -130,6 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec63370eb3c0df143a450de4a2ceb638, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ZombieHealth
+  ShowTopMostFoldoutHeaderGroup: 1
   maxHealth: 100
   headName: spine.005
   headMultiplier: 2.5
@@ -145,33 +177,6 @@ MonoBehaviour:
   deathForceMultiplier: 1
   maxPushSpeed: 4
   maxUpwardPush: 0.2
---- !u!114 &6173173794136255366
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4559668279591376524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1842138678
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  m_InScenePlacedDisabledByDefault: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  m_InScenePlaced: 0
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &3856297020321404191
 MonoBehaviour:
   m_ObjectHideFlags: 0
