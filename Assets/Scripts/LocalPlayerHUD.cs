@@ -8,8 +8,15 @@ public class LocalPlayerHUD : MonoBehaviour
     public HealthHUD healthHUD;
     public TextMeshProUGUI pointsText;
 
+    [Header("Interaction Prompts")]
+    public TextMeshProUGUI interactionPromptText;
+
     private bool bound;
 
+    private void Start()
+    {
+        if (interactionPromptText != null) interactionPromptText.gameObject.SetActive(false);
+    }
     private void Update()
     {
         if (bound) return;
@@ -28,5 +35,19 @@ public class LocalPlayerHUD : MonoBehaviour
         if (points != null && pointsText != null) points.SetText(pointsText);
         if (health != null && healthHUD != null) healthHUD.SetHealth(health);
         bound = true;
+    }
+
+    public void ShowPrompt(string message)
+    {
+        if (interactionPromptText != null)
+        {
+            interactionPromptText.text = message;
+            interactionPromptText.gameObject.SetActive(true);
+        }
+    }
+
+    public void HidePrompt()
+    {
+        if (interactionPromptText != null) interactionPromptText.gameObject.SetActive(false);
     }
 }

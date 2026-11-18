@@ -53,7 +53,21 @@ public class PlayerPoints : NetworkBehaviour
         pointsText = text;
         UpdateUI();
     }
+public bool TrySpendPoints(int cost)
+    {
+        if (!IsServer) return false;
 
+        if (totalPoints.Value >= cost)
+        {
+            // Deduct only from current points (mecanica invisivel)
+            if (totalPoints.Value >= cost)
+            {
+                totalPoints.Value -= cost; 
+                return true;
+            }
+        }
+        return false;
+    }
     private void UpdateUI()
     {
         if (pointsText != null)

@@ -13,7 +13,7 @@ public class WeaponManager : NetworkBehaviour
     private AmmoHUD localAmmoHUD;
     // Using NetworkVariable so late-joiners instantly see the correct weapon
     public NetworkVariable<int> activeSlotIndex = new NetworkVariable<int>(0);
-    private Weapon[] inventory = new Weapon[2];
+    private Weapon[] inventory = new Weapon[3];
 
     private void Start()
     {
@@ -27,7 +27,7 @@ public class WeaponManager : NetworkBehaviour
     {
         if (IsServer)
         {
-            for (int i = 0; i < startingWeapons.Length && i < 2; i++)
+            for (int i = 0; i < startingWeapons.Length && i < 3; i++)
             {
                 if (startingWeapons[i] != null)
                 {
@@ -54,6 +54,7 @@ public class WeaponManager : NetworkBehaviour
         // Ask the server to swap weapons
         if (kb.digit1Key.wasPressedThisFrame) RequestSwapServerRpc(0);
         if (kb.digit2Key.wasPressedThisFrame) RequestSwapServerRpc(1);
+        if (kb.digit3Key.wasPressedThisFrame) RequestSwapServerRpc(2);
     }
 
     [Rpc(SendTo.Server)]

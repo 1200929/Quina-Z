@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1763c8724f4728244835d96161609af3, type: 3}
   m_Name: m16a2
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Weapon
+  weaponName: G3a3
   weaponType: 0
   damage: 30
   pellets: 1
