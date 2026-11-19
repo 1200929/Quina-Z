@@ -1,0 +1,6 @@
+arms texture
+sleeves
+https://texturelabs.org/textures/fabric_185/
+
+skin
+https://texturelabs.org/textures/fabric_135/
