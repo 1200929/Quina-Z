@@ -2,12 +2,13 @@
 g3a3
 ar10
 mp5
+handcannon
+holy_handgrenade
 
 //RIGGED
 sawedoff_doublebarrel_shotgun
 glock17
 blunderbuss
-holy_handgrenade
 sword_puzzle (d afonso henriques)
 
 //UP NEXT
