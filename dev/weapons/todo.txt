@@ -1,0 +1,57 @@
+//DONE
+g3a3
+ar10
+mp5
+
+//RIGGED
+sawedoff_doublebarrel_shotgun
+glock17
+blunderbuss
+holy_handgrenade
+sword_puzzle (d afonso henriques)
+
+//UP NEXT
+pá de padeiro
+axe
+dagger
+spear
+polearm
+greatsword
+bow
+crossbow
+
+p08
+c96
+sw model 10
+usp
+beretta 92
+
+charleville musket
+kar98k
+
+sten
+mp18
+uzi
+
+fabarm stf 12
+spas 15
+
+fn fal
+sg543
+scarl/h
+g36k
+hk416/7
+
+lewis gun
+madsen
+m60e3
+minimi
+
+psg1
+awsf
+barret m82
+
+bazooka
+m79 gl
+milkor mgl
+m72 law
