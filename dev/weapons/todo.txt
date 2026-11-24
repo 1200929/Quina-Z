@@ -11,6 +11,16 @@ glock17
 blunderbuss
 sword_puzzle (d afonso henriques)
 
+//MODELS
+sten
+mp18 (sten anims)
+scarl (ar10 anims)
+bow
+crossbow
+crossbow_pistol
+crossbow_spin
+kar98k
+
 //UP NEXT
 pá de padeiro
 axe
@@ -18,8 +28,6 @@ dagger
 spear
 polearm
 greatsword
-bow
-crossbow
 
 p08
 c96
@@ -30,8 +38,6 @@ beretta 92
 charleville musket
 kar98k
 
-sten
-mp18
 uzi
 
 fabarm stf 12
@@ -39,7 +45,6 @@ spas 15
 
 fn fal
 sg543
-scarl/h
 g36k
 hk416/7
 
