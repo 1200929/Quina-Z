@@ -38,7 +38,7 @@ MonoBehaviour:
   spareMagazines: 25
   maxSpareMagazines: 30
   reloadMode: 0
-  reloadTime: 2.67
+  reloadTime: 2.95
   shellReloadStartTime: 0.4
   shellInsertTime: 0.5
   shellReloadEndTime: 0.4
