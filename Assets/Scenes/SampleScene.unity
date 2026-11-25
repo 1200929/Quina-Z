@@ -522,7 +522,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WallBuy
   ShowTopMostFoldoutHeaderGroup: 1
-  weaponPrefab: {fileID: -2276059207248122521, guid: 36d56ae89a21e9844b5a58be6140638b, type: 3}
+  weaponPrefab: {fileID: 0}
   weaponName: G3a3
   cost: 1300
 --- !u!1 &319951742

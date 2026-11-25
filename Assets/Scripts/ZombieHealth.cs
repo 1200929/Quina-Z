@@ -122,12 +122,16 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
         if (!IsServer) return;
         if (IsDead) return;
 
-        float multiplier = IsHead(info.collider) ? headMultiplier : 1f;
+        // Explosions hit the whole body, so they never count as headshots or leg hits
+        bool bodyPartHit = info.type != DamageType.Explosion;
+        bool headshot = bodyPartHit && IsHead(info.collider);
+
+        float multiplier = headshot ? headMultiplier : 1f;
         CurrentHealth -= info.damage * multiplier;
 
         int pointsEarned = torsoPoints; // Default for now, any part that is not the legs or head is considered the torso for testing purposes.
-        if (IsHead(info.collider)) pointsEarned = headPoints;
-        else if (IsLeg(info.collider)) pointsEarned = legPoints;
+        if (headshot) pointsEarned = headPoints;
+        else if (bodyPartHit && IsLeg(info.collider)) pointsEarned = legPoints;
 
         if (CurrentHealth <= 0f) pointsEarned += killBonus;
 
@@ -232,7 +236,12 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
         Vector3 push = force * deathForceMultiplier;
         if (push.sqrMagnitude < 0.0001f) return;
 
+        //cap ragdoll speed if you hate fun
+        //float speed = Mathf.Min(push.magnitude / hitBody.mass, maxPushSpeed); 
+
+        //no limit to the launch
         float speed = push.magnitude / hitBody.mass;
+
         hitBody.AddForce(push.normalized * speed, ForceMode.VelocityChange);
     }
 }

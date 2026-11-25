@@ -20,11 +20,15 @@ public class PlayerMovement : NetworkBehaviour
     private Vector2 lookInput;
     private float xRotation = 0f;
 
+    private WeaponManager weaponManager;
+    private Weapon ActiveWeapon => weaponManager != null ? weaponManager.ActiveWeapon : null;
+
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+        weaponManager = GetComponent<WeaponManager>();
         //INPUT SYSTEM
-        
+
     }
 
     private void OnEnable()
@@ -58,7 +62,9 @@ public class PlayerMovement : NetworkBehaviour
         // Este jogador pertence a outra pessoa: sem input, sem câmara, sem arma
         enabled = false;
         GetComponent<CharacterController>().enabled = false;
-        playerCamera.GetComponent<Camera>().enabled = false;
+        // Every camera of other players (including a viewmodel camera, if you add one)
+        foreach (var cam in GetComponentsInChildren<Camera>(true))
+            cam.enabled = false;
 
         var listener = playerCamera.GetComponent<AudioListener>();
         if (listener != null) listener.enabled = false;
@@ -76,6 +82,10 @@ public class PlayerMovement : NetworkBehaviour
 
     private void Update()
     {
+        // Tell the equipped weapon whether we're moving (moving accuracy)
+        Weapon activeWeapon = ActiveWeapon;
+        if (activeWeapon != null) activeWeapon.IsMoving = moveInput.sqrMagnitude > 0.01f;
+
         HandleLook();
         HandleMovement();
     }
@@ -84,6 +94,12 @@ public class PlayerMovement : NetworkBehaviour
     {
         float mouseX = lookInput.x * mouseSensitivity;
         float mouseY = lookInput.y * mouseSensitivity;
+
+        // Weapon recoil kicks the view (x = degrees up, y = degrees to the right)
+        Weapon weapon = ActiveWeapon;
+        Vector2 recoil = weapon != null ? weapon.ConsumeRecoil() : Vector2.zero;
+        mouseX += recoil.y;
+        mouseY += recoil.x;
 
         //MOVER CAMARA COM RATO
         xRotation -= mouseY;
@@ -96,7 +112,9 @@ public class PlayerMovement : NetworkBehaviour
     private void HandleMovement()
     {
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
-        controller.Move(move * speed * Time.deltaTime);
+        Weapon weapon = ActiveWeapon;
+        float weaponSpeed = weapon != null ? weapon.MovementSpeedMultiplier : 1f; // heavier weapons slow you down
+        controller.Move(move * speed * weaponSpeed * Time.deltaTime);
 
         //GRAVIDADE
         if (controller.isGrounded && velocity.y < 0)

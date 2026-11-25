@@ -1,26 +1,32 @@
 using UnityEngine;
 
+public enum DamageType { Bullet, Melee, Projectile, Explosion }
+
 /// <summary>
-/// Information about one hit, sent by a Weapon to whatever it hit.
+/// Information about one hit, sent by a Weapon (or Projectile) to whatever it hit.
 /// </summary>
 public struct DamageInfo
 {
-    /// Base damage after range falloff. Hit-zone multipliers (headshots etc.) are up to the receiver
+    /// <summary>Damage after range falloff / penetration losses. Hit-zone multipliers (headshots) are up to the receiver.</summary>
     public float damage;
-    // World position of the impact.
+    /// <summary>World position of the impact.</summary>
     public Vector3 point;
-    // Direction the shot was travelling (normalized).
+    /// <summary>Direction the shot/swing/explosion was travelling (normalized).</summary>
     public Vector3 direction;
-    // Impulse the weapon wants applied (direction * impactForce), used in ragdolls for now.
+    /// <summary>Impulse the weapon wants applied (direction * impactForce), e.g. for ragdolls.</summary>
     public Vector3 force;
-    // The exact collider that was hit (use it to work out head/torso/limb).
+    /// <summary>The exact collider that was hit (use it to work out head/torso/limb).</summary>
     public Collider collider;
-    // The weapon that fired.
+    /// <summary>The weapon that fired.</summary>
     public Weapon source;
+    /// <summary>What kind of damage this is. Explosions, for example, shouldn't count as headshots.</summary>
+    public DamageType type;
 }
 
-
-// Anything that can be shot is included in this interface.
+/// <summary>
+/// Implement this on anything that can be shot (zombies, props, barricades...).
+/// The weapon looks for it on the hit collider or its parents.
+/// </summary>
 public interface IDamageable
 {
     void TakeDamage(DamageInfo info);

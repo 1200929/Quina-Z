@@ -33,13 +33,13 @@ public class AmmoHUD : MonoBehaviour
 
     private void Refresh()
     {
-        if (weapon == null || weapon.data == null) return;
-        
-        ammoText.text = weapon.AmmoInMagazine + " / " + weapon.ReserveAmmo;
+        if (weapon == null || weapon.BaseData == null) return;
+
+        // Each weapon type decides what to show: "30 / 150" (gun), item count (grenade/spear), empty (melee)
+        if (ammoText != null)
+            ammoText.text = weapon.GetAmmoText();
 
         if (weaponNameText != null)
-        {
-            weaponNameText.text = weapon.data.weaponName;
-        }
+            weaponNameText.text = weapon.BaseData.weaponName;
     }
 }

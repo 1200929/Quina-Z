@@ -3,263 +3,267 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
-/// Shared weapon logic for every gun and melee weapon. Stats come from a WeaponData asset.
-/// Fully self-contained: it only depends on WeaponData and IDamageable.
+/// Base class for every weapon. Don't add this directly, add one of:
+///   Firearm, MeleeWeapon, ProjectileWeapon
 ///
-/// Hooks for other systems (player, zombies, HUD) are exposed as public properties/events:
+/// Common stuff lives here: references, draw animation, busy state, damage helper, events.
+/// Hits are applied on the server (host); clients send their aim to the server with an RPC.
+///
+/// Hooks for other systems:
 ///   - Player movement: set weapon.IsMoving every frame, read weapon.MovementSpeedMultiplier.
-///   - Targets: implement IDamageable on anything that can be shot.
-///   - HUD/FX: subscribe to the On... events.
+///   - Targets: implement IDamageable on anything that can be damaged.
+///   - HUD/FX: subscribe to the On... events (hit events only fire on the server/host).
 /// </summary>
-public class Weapon : NetworkBehaviour
+public abstract class Weapon : NetworkBehaviour
 {
     [Header("References")]
-    public WeaponData data;
     [Tooltip("Where rays start/aim from. Assign the player camera (falls back to Camera.main).")]
     public Transform aimOrigin;
     [Tooltip("Optional. Colliders under this transform are ignored by shots (assign the player root).")]
     public Transform ignoreRoot;
-    [Tooltip("Optional. Used for fire/reload sounds.")]
+    [Tooltip("Optional. Used for weapon sounds.")]
     public AudioSource audioSource;
-    [Tooltip("Layers the weapon can hit.")]
-    public LayerMask hitMask = ~0;
+    [Tooltip("Layers the weapon can hit. The 'Ignore Raycast' layer is always excluded.")]
+    public LayerMask hitMask = Physics.DefaultRaycastLayers;
+    [Tooltip("Layers (by name) that shots always pass through, e.g. ragdoll corpses and players. " +
+             "Names of layers that don't exist are skipped.")]
+    public string[] alwaysIgnoreLayers = { "Corpse", "Player" };
+
+    [Header("Animation (optional - leave the Animator empty to run without animations)")]
+    public Animator animator;
+
+    [Tooltip("Animator trigger parameters. Names must match your Animator Controller.")]
+    public string drawTrigger = "Draw";
+    public string reloadTrigger = "Reload";
+    [Tooltip("Played on every shot / swing / throw.")]
+    public string fireTrigger = "Fire";
+    [Tooltip("State TAGS set on the Draw and Reload states in the Animator. " +
+             "The weapon is busy (can't fire) while the animator is in a state with these tags.")]
+    public string drawTag = "Draw";
+    public string reloadTag = "Reload";
+
+    /// <summary>The stats asset of this weapon (each subclass has its own typed 'data' field).</summary>
+    public abstract WeaponData BaseData { get; }
 
     // ---- Set by the player later ----
     /// <summary>Set this from your movement script. Moving uses the "moving" spread.</summary>
     public bool IsMoving { get; set; }
     /// <summary>Read this from your movement script to slow the player with heavier weapons.</summary>
-    public float MovementSpeedMultiplier => data != null ? data.movementSpeedMultiplier : 1f;
+    public float MovementSpeedMultiplier => BaseData != null ? BaseData.movementSpeedMultiplier : 1f;
 
     // ---- Runtime state (read these from your HUD) ----
-    public int AmmoInMagazine { get; private set; }
-    public int ReserveAmmo { get; private set; }
-    public bool IsReloading { get; private set; }
-    public float CurrentSpread { get; private set; }
-    public int SpareMagazines => data == null || data.magazineSize <= 0
-        ? 0 : Mathf.CeilToInt((float)ReserveAmmo / data.magazineSize);
+    /// <summary>Rounds in the magazine (firearms only).</summary>
+    public int AmmoInMagazine { get; protected set; }
+    /// <summary>Spare rounds (firearms) or items left (projectile weapons).</summary>
+    public int ReserveAmmo { get; protected set; }
+    public bool IsReloading { get; protected set; }
+    public bool IsDrawing { get; private set; }
+    /// <summary>True while a draw or reload is in progress. You can't attack then.</summary>
+    public virtual bool IsBusy => IsDrawing || IsReloading;
 
     public event Action OnAmmoChanged;
     public event Action OnFired;
     public event Action OnReloadStarted;
     public event Action OnReloadFinished;
-    /// <summary>Hit info, and whether the thing hit was an IDamageable.</summary>
+    /// <summary>Hit info, and whether the thing hit was an IDamageable. Only fires on the server/host.</summary>
     public event Action<RaycastHit, bool> OnHit;
 
-    private float nextFireTime;
-    private bool isBursting;
-    private float bloom;
-    private float movementBlend; // 0 = stationary accuracy, 1 = moving accuracy
+    protected void RaiseAmmoChanged() => OnAmmoChanged?.Invoke();
+    protected void RaiseFired() => OnFired?.Invoke();
+    protected void RaiseReloadStarted() => OnReloadStarted?.Invoke();
+    protected void RaiseReloadFinished() => OnReloadFinished?.Invoke();
+    protected void RaiseHit(RaycastHit hit, bool wasDamageable) => OnHit?.Invoke(hit, wasDamageable);
 
-    private readonly RaycastHit[] hitBuffer = new RaycastHit[32];
-    private static readonly IComparer<RaycastHit> DistanceComparer =
+    protected readonly RaycastHit[] hitBuffer = new RaycastHit[32];
+    protected static readonly IComparer<RaycastHit> DistanceComparer =
         Comparer<RaycastHit>.Create((a, b) => a.distance.CompareTo(b.distance));
 
-    private void Awake()
+    /// <summary>True on the host/server, and also when running without networking (e.g. testing a lone scene).</summary>
+    protected bool RunsOnServer => !IsSpawned || IsServer;
+
+    // ---------------------------------------------------------------- Lifecycle
+    private int effectiveHitMask;
+    /// <summary>hitMask without 'Ignore Raycast' and without the layers in alwaysIgnoreLayers. Use this for every cast.</summary>
+    protected int HitMaskValue => effectiveHitMask;
+
+    private int ComputeHitMask()
     {
-        if (aimOrigin == null && Camera.main != null) aimOrigin = Camera.main.transform;
+        int mask = hitMask.value & Physics.DefaultRaycastLayers; // removes the Ignore Raycast layer
+        if (alwaysIgnoreLayers != null)
+        {
+            foreach (string layerName in alwaysIgnoreLayers)
+            {
+                if (string.IsNullOrEmpty(layerName)) continue;
+                int layer = LayerMask.NameToLayer(layerName);
+                if (layer >= 0) mask &= ~(1 << layer);
+            }
+        }
+        return mask;
+    }
+
+    protected virtual void Awake()
+    {
+        effectiveHitMask = ComputeHitMask();
+
+        if (aimOrigin == null && Camera.main != null)
+            aimOrigin = Camera.main.transform;
+
+        SetupAnimator();
+
         ResetAmmo();
     }
 
-    private void OnEnable()
+    protected virtual void OnEnable()
     {
-        IsReloading = false;
-        isBursting = false;
+        ResetState();
+        StartCoroutine(DrawRoutine()); // equipping plays the draw animation
     }
 
-    private void OnDisable()
+    protected virtual void OnDisable()
     {
-        // Unequipping cancels reload/burst
+        // Unequipping cancels draw / reload / burst / swing
         StopAllCoroutines();
+        IsDrawing = false;
         IsReloading = false;
-        isBursting = false;
-    }
-
-    public void ResetAmmo()
-    {
-        if (data == null) return;
-        AmmoInMagazine = data.magazineSize;
-        ReserveAmmo = data.spareMagazines * data.magazineSize;
-        OnAmmoChanged?.Invoke();
-    }
-
-    public bool AddAmmo(int magazines)
-    {
-        int max = data.maxSpareMagazines * data.magazineSize;
-        if (ReserveAmmo >= max) return false;
-        ReserveAmmo = Mathf.Min(max, ReserveAmmo + magazines * data.magazineSize);
-        OnAmmoChanged?.Invoke();
-        return true;
+        ResetState();
+        ResetAnimatorTriggers();
     }
 
     private void Update()
     {
-        if (data == null || aimOrigin == null) return;
-
-        UpdateSpread();
-
-        var mouse = Mouse.current;
-        var keyboard = Keyboard.current;
-        if (mouse == null) return;
-
-        if (data.weaponType == WeaponType.Ranged && keyboard != null && keyboard.rKey.wasPressedThisFrame)
-            TryReload();
-
-        if (IsReloading) return;
-
-        bool wantsFire = data.fireMode == FireMode.FullAuto
-            ? mouse.leftButton.isPressed
-            : mouse.leftButton.wasPressedThisFrame;
-
-        if (wantsFire) TryFire();
+        if (BaseData == null || aimOrigin == null) return;
+        if (IsSpawned && !IsOwner) return; // only the owning player controls this weapon
+        Tick();
     }
 
-    // ---------------------------------------------------------------- Accuracy
-    private void UpdateSpread()
+    /// <summary>Per-frame logic (input, spread, recoil...) implemented by each weapon type.</summary>
+    protected abstract void Tick();
+
+    /// <summary>Called when equipped and unequipped, so subclasses can clear their own flags.</summary>
+    protected virtual void ResetState() { }
+
+    protected virtual void SetupAnimator()
     {
-        float step = Time.deltaTime / Mathf.Max(0.01f, data.accuracyTransitionTime);
-        movementBlend = Mathf.MoveTowards(movementBlend, IsMoving ? 1f : 0f, step);
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
 
-        bloom = Mathf.Max(0f, bloom - data.bloomRecovery * Time.deltaTime);
-
-        CurrentSpread = Mathf.Lerp(data.spreadStationary, data.spreadMoving, movementBlend) + bloom;
-    }
-
-    // ---------------------------------------------------------------- Firing
-    private void TryFire()
-    {
-        if (isBursting || Time.time < nextFireTime) return;
-
-        if (data.weaponType == WeaponType.Melee)
+        if (animator == null)
         {
-            nextFireTime = Time.time + data.SecondsBetweenShots;
-            Melee();
+            Debug.LogError($"{name}: Could not find the model Animator!", this);
             return;
         }
-
-
-        //only 1 shot left in magazine, fire then reload
-        if (AmmoInMagazine == 1)
-        {
-            FireShot();
-            TryReload();    // auto reload when empty
-            return;
-        }
-
-        //no ammo left in magazine
-        if (AmmoInMagazine <= 0)
-        {
-            PlaySound(data.emptySound);
-            nextFireTime = Time.time + 0.25f;
-            TryReload();    //auto reload when empty
-            return;
-        }
-
-        nextFireTime = Time.time + data.SecondsBetweenShots;
-
-        //burst firemode uses its own code
-        if (data.fireMode == FireMode.Burst)
-            StartCoroutine(BurstRoutine());
-        else
-            FireShot();
     }
 
-    private IEnumerator BurstRoutine()
+    public virtual void ResetAmmo() { }
+
+    /// <summary>Call from ammo pickups / wall buys. Returns true if any ammo was added.</summary>
+    public virtual bool AddAmmo(int amount) { return false; }
+
+    /// <summary>Text for the ammo HUD: "30 / 150" for guns, the item count for throwables, empty for melee.</summary>
+    public virtual string GetAmmoText() => AmmoInMagazine + " / " + ReserveAmmo;
+
+    /// <summary>
+    /// Camera kick (degrees) to apply this frame, then cleared. x = pitch UP, y = yaw to the RIGHT.
+    /// Only firearms have recoil; the player's look script should call this every frame.
+    /// </summary>
+    public virtual Vector2 ConsumeRecoil() => Vector2.zero;
+
+    // ---------------------------------------------------------------- Animation helpers
+    protected void SetTrigger(string trigger)
     {
-        isBursting = true;
-        for (int i = 0; i < data.burstCount; i++)
-        {
-            FireShot();
-
-            if (AmmoInMagazine <= 0)
-                break;
-
-            if (i < data.burstCount - 1)
-                yield return new WaitForSeconds(data.SecondsBetweenShots);
-        }
-        nextFireTime = Time.time + data.burstCooldown;
-        isBursting = false;
-
-        if (AmmoInMagazine <= 0)
-        {
-            TryReload();    //auto reload when empty
-        }
+        if (animator != null && animator.isActiveAndEnabled && !string.IsNullOrEmpty(trigger))
+            animator.SetTrigger(trigger);
     }
 
-    private void FireShot()
+    protected virtual void ResetAnimatorTriggers()
     {
-        AmmoInMagazine--;
-
-        for (int i = 0; i < Mathf.Max(1, data.pellets); i++)
-            FireRay(CurrentSpread);
-
-        // Every shot makes the next one less accurate (recoil or bloom) 
-        bloom = Mathf.Min(data.maxBloom, bloom + data.bloomPerShot);
-
-        PlaySound(data.fireSound);
-        OnFired?.Invoke();
-        OnAmmoChanged?.Invoke();
+        if (animator == null) return;
+        if (!string.IsNullOrEmpty(drawTrigger)) animator.ResetTrigger(drawTrigger);
+        if (!string.IsNullOrEmpty(reloadTrigger)) animator.ResetTrigger(reloadTrigger);
+        if (!string.IsNullOrEmpty(fireTrigger)) animator.ResetTrigger(fireTrigger);
     }
 
-    private void FireRay(float spreadDegrees)
+    /// <summary>True if the animator is in (or transitioning into) a state with this tag.</summary>
+    private bool AnimatorInTag(string tag)
     {
-        Vector3 origin = aimOrigin.position;
-        Vector3 dir = ApplySpread(aimOrigin, spreadDegrees);
-
-        if (IsServer)
-            ServerFire(origin, dir);      // o host aplica logo
-        else
-            FireServerRpc(origin, dir);   // o cliente pede ao host
-    }
-
-    [Rpc(SendTo.Server)]
-    private void FireServerRpc(Vector3 origin, Vector3 dir)
-    {
-        ServerFire(origin, dir);
-    }
-
-    private void ServerFire(Vector3 origin, Vector3 dir)
-    {
-        if (TryGetHit(origin, dir, data.range, 0f, out RaycastHit hit))
-            ApplyHit(hit, dir);
-    }
-
-    private static Vector3 ApplySpread(Transform t, float degrees)
-    {
-        if (degrees <= 0f) return t.forward;
-        Vector2 r = UnityEngine.Random.insideUnitCircle * Mathf.Tan(degrees * Mathf.Deg2Rad);
-        return (t.forward + t.right * r.x + t.up * r.y).normalized;
-    }
-
-    private void Melee()
-    {
-        Vector3 origin = aimOrigin.position;
-        Vector3 dir = aimOrigin.forward;
-
-        if (TryGetHit(origin, dir, data.range, data.meleeRadius, out RaycastHit hit))
-            ApplyHit(hit, dir);
-
-        PlaySound(data.fireSound);
-        OnFired?.Invoke();
+        if (animator == null || string.IsNullOrEmpty(tag)) return false;
+        if (animator.GetCurrentAnimatorStateInfo(0).IsTag(tag)) return true;
+        return animator.IsInTransition(0) && animator.GetNextAnimatorStateInfo(0).IsTag(tag);
     }
 
     /// <summary>
-    /// Ray (or sphere cast for melee) that returns the closest hit that isn't ignored.
+    /// Waits until the animation tagged 'tag' has started and then finished.
+    /// If the animator never enters it (trigger/tag not set up), logs a warning and waits 'fallbackSeconds' instead.
     /// </summary>
-    private bool TryGetHit(Vector3 origin, Vector3 dir, float range, float radius, out RaycastHit best)
+    protected IEnumerator WaitForAnimation(string tag, float fallbackSeconds)
+    {
+        if (animator == null)
+        {
+            if (fallbackSeconds > 0f) yield return new WaitForSeconds(fallbackSeconds);
+            yield break;
+        }
+
+        float waited = 0f;
+        while (!AnimatorInTag(tag))
+        {
+            waited += Time.deltaTime;
+            if (waited > 0.5f)
+            {
+                Debug.LogWarning($"{name}: animator never entered a state tagged '{tag}'. " +
+                                 "Check the trigger name, the transition and the state's Tag.", this);
+                if (fallbackSeconds > 0f) yield return new WaitForSeconds(fallbackSeconds);
+                yield break;
+            }
+            yield return null;
+        }
+
+        while (AnimatorInTag(tag))
+            yield return null;
+    }
+
+    private IEnumerator DrawRoutine()
+    {
+        IsDrawing = true;
+
+        // Wait a frame: weapons that are switched off straight after spawning never make a sound
+        yield return null;
+        PlaySound(BaseData != null ? BaseData.drawSound : null);
+
+        if (animator != null)
+        {
+            ResetAnimatorTriggers();
+            SetTrigger(drawTrigger);
+            yield return WaitForAnimation(drawTag, 0f);
+        }
+        IsDrawing = false;
+    }
+
+    // ---------------------------------------------------------------- Hit helpers
+    public static IDamageable FindDamageable(Collider col)
+    {
+        return col != null ? col.GetComponentInParent<IDamageable>() : null;
+    }
+
+    protected bool IsIgnored(Collider col)
+    {
+        return ignoreRoot != null && col.transform.IsChildOf(ignoreRoot);
+    }
+
+    /// <summary>Closest hit of a ray (or sphere cast if radius > 0) that isn't the player.</summary>
+    protected bool TryGetHit(Vector3 origin, Vector3 dir, float range, float radius, out RaycastHit best)
     {
         int count = radius > 0f
-            ? Physics.SphereCastNonAlloc(origin, radius, dir, hitBuffer, range, hitMask, QueryTriggerInteraction.Ignore)
-            : Physics.RaycastNonAlloc(origin, dir, hitBuffer, range, hitMask, QueryTriggerInteraction.Ignore);
+            ? Physics.SphereCastNonAlloc(origin, radius, dir, hitBuffer, range, HitMaskValue, QueryTriggerInteraction.Ignore)
+            : Physics.RaycastNonAlloc(origin, dir, hitBuffer, range, HitMaskValue, QueryTriggerInteraction.Ignore);
 
         Array.Sort(hitBuffer, 0, count, DistanceComparer);
 
         for (int i = 0; i < count; i++)
         {
             RaycastHit h = hitBuffer[i];
-            if (ignoreRoot != null && h.collider.transform.IsChildOf(ignoreRoot)) continue; // never hit ourselves
+            if (IsIgnored(h.collider)) continue;
             if (h.distance <= 0f && radius > 0f) continue; // sphere started inside something
             best = h;
             return true;
@@ -269,65 +273,36 @@ public class Weapon : NetworkBehaviour
         return false;
     }
 
-    private void ApplyHit(RaycastHit hit, Vector3 dir)
+    protected void DealDamage(IDamageable target, RaycastHit hit, Vector3 dir, float damage, DamageType type)
     {
-        //Debug.Log("Weapon raycast struck: " + hit.collider.name);
-
-        IDamageable target = hit.collider.GetComponentInParent<IDamageable>();
-
-        if (target != null)
+        target.TakeDamage(new DamageInfo
         {
-            float falloff = 1f;
-            if (hit.distance > data.falloffStartDistance && data.range > data.falloffStartDistance)
-            {
-                float t = (hit.distance - data.falloffStartDistance) / (data.range - data.falloffStartDistance);
-                falloff = Mathf.Lerp(1f, data.damageAtMaxRange, t);
-            }
-
-            target.TakeDamage(new DamageInfo
-            {
-                damage = data.damage * falloff,
-                point = hit.point,
-                direction = dir,
-                force = dir * data.impactForce,
-                collider = hit.collider,
-                source = this
-            });
-        }
-
-        OnHit?.Invoke(hit, target != null); // hook up hit markers / impact effects / blood here
+            damage = damage,
+            point = hit.point,
+            direction = dir,
+            force = dir * BaseData.impactForce,
+            collider = hit.collider,
+            source = this,
+            type = type
+        });
     }
 
-    // ---------------------------------------------------------------- Reload
-    public bool TryReload()
+    protected static float ComputeFalloff(float distance, float range, float falloffStart, float damageAtMaxRange)
     {
-        if (data.weaponType != WeaponType.Ranged) return false;
-        if (IsReloading || isBursting) return false;
-        if (AmmoInMagazine >= data.magazineSize || ReserveAmmo <= 0) return false;
-
-        StartCoroutine(ReloadRoutine());
-        return true;
+        if (distance <= falloffStart || range <= falloffStart) return 1f;
+        float t = Mathf.Clamp01((distance - falloffStart) / (range - falloffStart));
+        return Mathf.Lerp(1f, damageAtMaxRange, t);
     }
 
-    private IEnumerator ReloadRoutine()
+    protected static Vector3 ApplySpread(Quaternion rotation, float degrees)
     {
-        IsReloading = true;
-        PlaySound(data.reloadSound);
-        OnReloadStarted?.Invoke();
-
-        yield return new WaitForSeconds(data.reloadTime);
-
-        int needed = data.magazineSize - AmmoInMagazine;
-        int taken = Mathf.Min(needed, ReserveAmmo);
-        AmmoInMagazine += taken;
-        ReserveAmmo -= taken;
-
-        IsReloading = false;
-        OnReloadFinished?.Invoke();
-        OnAmmoChanged?.Invoke();
+        Vector3 forward = rotation * Vector3.forward;
+        if (degrees <= 0f) return forward;
+        Vector2 r = UnityEngine.Random.insideUnitCircle * Mathf.Tan(degrees * Mathf.Deg2Rad);
+        return (forward + (rotation * Vector3.right) * r.x + (rotation * Vector3.up) * r.y).normalized;
     }
 
-    private void PlaySound(AudioClip clip)
+    protected void PlaySound(AudioClip clip)
     {
         if (audioSource != null && clip != null) audioSource.PlayOneShot(clip);
     }

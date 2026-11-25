@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3307da69b2220484883eb2787d41eb74, type: 3}
+  m_Name: handcannon
+  m_EditorClassIdentifier: Assembly-CSharp::FirearmData
+  weaponName: Hand Cannon
+  damage: 8
+  impactForce: 850
+  movementSpeedMultiplier: 1
+  attackSound: {fileID: 0}
+  drawSound: {fileID: 0}
+  pellets: 18
+  range: 80
+  damageAtMaxRange: 0
+  falloffStartDistance: 15
+  penetrableLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxWallThickness: 0
+  wallDamageRetained: 0.5
+  maxTargetPenetrations: 1
+  targetDamageRetained: 0.65
+  fireMode: 1
+  fireRate: 600
+  burstCount: 3
+  burstCooldown: 0.25
+  autoReload: 1
+  magazineSize: 1
+  spareMagazines: 25
+  maxSpareMagazines: 30
+  reloadMode: 0
+  reloadTime: 2.67
+  shellReloadStartTime: 0.4
+  shellInsertTime: 0.5
+  shellReloadEndTime: 0.4
+  canFireInterruptReload: 0
+  spreadStationary: 5
+  spreadMoving: 7.5
+  spreadWorsenTime: 0.3
+  spreadRecoverTime: 0.1
+  bloomPerShot: 2
+  maxBloom: 3
+  bloomRecovery: 5
+  recoilPitchMin: 13.5
+  recoilPitchMax: 15
+  recoilYawMin: -4
+  recoilYawMax: 4
+  recoilRecoverySpeed: 5
+  recoilRecoveryDelay: 0.2
+  useFireDelay: 1
+  fireDelay: 0.44
+  reloadSound: {fileID: 0}
+  emptySound: {fileID: 0}
