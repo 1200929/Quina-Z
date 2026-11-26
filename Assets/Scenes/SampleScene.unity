@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: b67da107c8ba430488a15ca2fa2cffff, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -522,8 +522,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WallBuy
   ShowTopMostFoldoutHeaderGroup: 1
-  weaponPrefab: {fileID: 0}
-  weaponName: G3a3
+  weaponPrefab: {fileID: 696349025596042653, guid: 972b5d01cedb2154b879077b407d2e1e, type: 3}
+  weaponName: G3A3
   cost: 1300
 --- !u!1 &319951742
 GameObject:

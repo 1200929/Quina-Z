@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3307da69b2220484883eb2787d41eb74, type: 3}
+  m_Name: g3a3_upgraded
+  m_EditorClassIdentifier: Assembly-CSharp::FirearmData
+  weaponName: G3A3 Upgraded
+  damage: 32
+  impactForce: 350
+  movementSpeedMultiplier: 0.8
+  attackSound: {fileID: 0}
+  drawSound: {fileID: 0}
+  pellets: 1
+  range: 1000
+  damageAtMaxRange: 0.8
+  falloffStartDistance: 100
+  penetrableLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxWallThickness: 1
+  wallDamageRetained: 0.8
+  maxTargetPenetrations: 3
+  targetDamageRetained: 0.65
+  fireMode: 2
+  fireRate: 900
+  burstCount: 3
+  burstCooldown: 0.33
+  autoReload: 1
+  magazineSize: 30
+  spareMagazines: 5
+  maxSpareMagazines: 8
+  reloadMode: 0
+  reloadTime: 4.1
+  shellReloadStartTime: 0.4
+  shellInsertTime: 0.5
+  shellReloadEndTime: 0.4
+  canFireInterruptReload: 1
+  spreadStationary: 0.25
+  spreadMoving: 4.5
+  spreadWorsenTime: 0.05
+  spreadRecoverTime: 0.6
+  bloomPerShot: 0.42
+  maxBloom: 3
+  bloomRecovery: 3.5
+  recoilPitchMin: 0.8
+  recoilPitchMax: 1.2
+  recoilYawMin: -0.9
+  recoilYawMax: 0.9
+  recoilRecoverySpeed: 5
+  recoilRecoveryDelay: 0.2
+  useFireDelay: 0
+  fireDelay: 0.1
+  reloadSound: {fileID: 0}
+  emptySound: {fileID: 0}

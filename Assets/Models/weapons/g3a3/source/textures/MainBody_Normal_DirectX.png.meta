@@ -1,13 +1,5 @@
 fileFormatVersion: 2
-<<<<<<< HEAD
-<<<<<<< HEAD
 guid: c4b8808acfbe0854e997e1a9eabbac53
-=======
-guid: 3ff4be8aa3527014abd5b06686e2cdb8
->>>>>>> 072c38e970b68fc132e856f7c095a957ab924c8a
-=======
-guid: 3ff4be8aa3527014abd5b06686e2cdb8
->>>>>>> 072c38e970b68fc132e856f7c095a957ab924c8a
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -15,7 +7,7 @@ TextureImporter:
   mipmaps:
     mipMapMode: 0
     enableMipMap: 1
-    sRGBTexture: 1
+    sRGBTexture: 0
     linearTexture: 0
     fadeOut: 0
     borderMipMap: 0
@@ -64,7 +56,7 @@ TextureImporter:
   spriteTessellationMethod: 0
   spriteTessellationDetail: -1
   spriteGeometrySubdivision: -1
-  textureType: 0
+  textureType: 1
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -103,28 +95,6 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 072c38e970b68fc132e856f7c095a957ab924c8a
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-<<<<<<< HEAD
->>>>>>> 072c38e970b68fc132e856f7c095a957ab924c8a
-=======
->>>>>>> 072c38e970b68fc132e856f7c095a957ab924c8a
   spriteSheet:
     serializedVersion: 2
     sprites: []
