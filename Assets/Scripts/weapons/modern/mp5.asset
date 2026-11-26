@@ -17,7 +17,7 @@ MonoBehaviour:
   impactForce: 180
   movementSpeedMultiplier: 1
   attackSound: {fileID: 0}
-  drawSound: {fileID: 0}
+  drawSound: {fileID: 8300000, guid: 0726b2d0bc46dd344b2ce41bec82a0c8, type: 3}
   pellets: 1
   range: 450
   damageAtMaxRange: 0.45
@@ -50,10 +50,10 @@ MonoBehaviour:
   bloomPerShot: 0.12
   maxBloom: 0.5
   bloomRecovery: 10
-  recoilPitchMin: 0.8
-  recoilPitchMax: 1.2
-  recoilYawMin: -0.25
-  recoilYawMax: 0.25
+  recoilPitchMin: 0.6
+  recoilPitchMax: 0.8
+  recoilYawMin: -0.15
+  recoilYawMax: 0.15
   recoilRecoverySpeed: 30
   recoilRecoveryDelay: 0.1
   useFireDelay: 0
