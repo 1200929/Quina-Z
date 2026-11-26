@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Unity.Netcode; // 1. Added Netcode library
+using Unity.Netcode;
 
 
 // 2. Changed from MonoBehaviour to NetworkBehaviour
@@ -9,6 +9,10 @@ public class WeaponManager : NetworkBehaviour
     [Header("Setup")]
     public Transform weaponHolder;
     public Weapon[] startingWeapons;
+
+    [Header("Player References")]
+    [SerializeField] private AudioSource playerAudioSource;
+    [SerializeField] private Camera playerCamera;
 
     [Header("Viewmodel (optional)")]
     [Tooltip("Layer name for YOUR OWN weapon/arms (e.g. 'Viewmodel'), drawn by a separate viewmodel camera so they don't clip into walls. Leave empty to skip.")]
@@ -172,23 +176,37 @@ public class WeaponManager : NetworkBehaviour
     [Rpc(SendTo.ClientsAndHost)]
     private void ReceiveWeaponRpc(ulong weaponNetworkId, int slotIndex)
     {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(weaponNetworkId, out NetworkObject netObj))
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(
+            weaponNetworkId, out NetworkObject netObj))
         {
             Weapon newWeapon = netObj.GetComponent<Weapon>();
-            newWeapon.aimOrigin = GetComponentInChildren<Camera>().transform;
-            newWeapon.ignoreRoot = transform.root;
 
-            // Own weapon goes on the viewmodel layer; other players' weapons stay on their normal layer
+            // Pass references from THIS player's prefab to the weapon
+            newWeapon.aimOrigin = playerCamera != null
+                ? playerCamera.transform
+                : GetComponentInChildren<Camera>().transform;
+
+            newWeapon.ignoreRoot = transform.root;
+            newWeapon.audioSource = playerAudioSource;
+
+            // Own weapon goes on the viewmodel layer
             if (IsOwner && !string.IsNullOrEmpty(viewmodelLayerName))
             {
                 int layer = LayerMask.NameToLayer(viewmodelLayerName);
-                if (layer >= 0) SetLayerRecursive(newWeapon.transform, layer);
-                else Debug.LogWarning($"Layer '{viewmodelLayerName}' doesn't exist. Create it in Project Settings > Tags and Layers.", this);
+
+                if (layer >= 0)
+                    SetLayerRecursive(newWeapon.transform, layer);
+                else
+                    Debug.LogWarning(
+                        $"Layer '{viewmodelLayerName}' doesn't exist. Create it in Project Settings > Tags and Layers.",
+                        this);
             }
+
             inventory[slotIndex] = newWeapon;
             UpdateVisuals(activeSlotIndex.Value);
         }
     }
+
     private static void SetLayerRecursive(Transform t, int layer)
     {
         t.gameObject.layer = layer;

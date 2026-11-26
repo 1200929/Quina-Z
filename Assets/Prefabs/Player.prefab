@@ -26,11 +26,11 @@ Transform:
   m_GameObject: {fileID: 855007629460051368}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4334808552682291568}
+  m_Father: {fileID: 1707697805930361295}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &8039334168045396443
 AudioSource:
@@ -161,7 +161,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2291683865840623865}
   - {fileID: 6083736677602633262}
   - {fileID: 4591816714986190244}
   m_Father: {fileID: 1707697805930361295}
@@ -477,6 +476,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4334808552682291568}
+  - {fileID: 2291683865840623865}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &257776667019354294
@@ -603,9 +603,11 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   weaponHolder: {fileID: 6083736677602633262}
   startingWeapons:
+  - {fileID: -6046859839870491681, guid: 0adb7653f81aa464aa9b9adb6014b40d, type: 3}
   - {fileID: -6601968451723406631, guid: c13a3f2d1d85eb647b55b74904f72eb1, type: 3}
-  - {fileID: 5685023107342810759, guid: 56143726dd5eb6748948ac07ae570db1, type: 3}
   - {fileID: 1965139093139232967, guid: a811ac46e3b0d80439ab8f92ab50e127, type: 3}
+  playerAudioSource: {fileID: 8039334168045396443}
+  playerCamera: {fileID: 5389514998902060546}
   viewmodelLayerName: Viewmodel
   activeSlotIndex:
     UpdateTraits:
@@ -625,11 +627,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   ShowTopMostFoldoutHeaderGroup: 1
-  walkSpeed: 4.5
+  walkSpeed: 4
   gravity: -9.81
-  sprintMultiplier: 1.6
+  sprintMultiplier: 1.5
   maxStamina: 100
-  staminaDrainPerSecond: 25
+  staminaDrainPerSecond: 20
   staminaRegenPerSecond: 15
   staminaRegenDelay: 1
   minStaminaToResume: 20

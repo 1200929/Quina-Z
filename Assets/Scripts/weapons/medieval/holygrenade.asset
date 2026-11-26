@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 551c7f46ce97eb24cab648efb3bdf7b0, type: 3}
   m_Name: holygrenade
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileData
-  weaponName: Weapon
+  weaponName: Holy Hand Grenade
   damage: 20
   impactForce: 400
   movementSpeedMultiplier: 1

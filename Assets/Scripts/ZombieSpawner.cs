@@ -25,6 +25,7 @@ public class ZombieSpawner : NetworkBehaviour
     private int zombiesLeftToSpawnInWave = 0;
     private float spawnTimer;
     private bool isWaitingForNextWave = false;
+    public int CurrentWave => currentWave.Value;
 
     private List<GameObject> activeZombies = new List<GameObject>();
 

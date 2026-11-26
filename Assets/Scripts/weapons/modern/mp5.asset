@@ -16,7 +16,7 @@ MonoBehaviour:
   damage: 16
   impactForce: 180
   movementSpeedMultiplier: 1
-  attackSound: {fileID: 0}
+  attackSound: {fileID: 8300000, guid: 170f3da405ba8a04fa59bdb1f4049f30, type: 3}
   drawSound: {fileID: 8300000, guid: 0726b2d0bc46dd344b2ce41bec82a0c8, type: 3}
   pellets: 1
   range: 450
@@ -58,5 +58,5 @@ MonoBehaviour:
   recoilRecoveryDelay: 0.1
   useFireDelay: 0
   fireDelay: 1
-  reloadSound: {fileID: 0}
-  emptySound: {fileID: 0}
+  reloadSound: {fileID: 8300000, guid: 5b932971fca65ed4dac59e5405349c68, type: 3}
+  emptySound: {fileID: 8300000, guid: 556d4aefdb794aa4d8c1ee7ad9582879, type: 3}

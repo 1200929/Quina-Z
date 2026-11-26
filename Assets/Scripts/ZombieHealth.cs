@@ -165,6 +165,8 @@ public class ZombieHealth : NetworkBehaviour, IDamageable
     // Runs on the server: tells everyone to show the ragdoll, then removes the zombie
     private void Die(DamageInfo info)
     {
+        if (GameManager.Instance != null) GameManager.Instance.AddKill();
+
         IsDead = true;
 
         string hitBone = info.collider != null ? info.collider.name : "";
