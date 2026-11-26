@@ -48,6 +48,12 @@ public class WeaponProjectile : Weapon
 
     public override string GetAmmoText() => ReserveAmmo.ToString();
 
+    /// <summary>With 'Can Equip When Empty' unticked (grenades, spears) you can't pull the weapon out with 0 left.</summary>
+    public override bool CanEquip => data == null || data.canEquipWhenEmpty || ReserveAmmo > 0;
+
+    // A used-up grenade/spear is put away, but not in the middle of the throw
+    public override bool WantsToUnequip => !CanEquip && !isThrowing && Time.time >= nextFireTime;
+
     protected override void Tick()
     {
         var mouse = Mouse.current;
@@ -79,6 +85,15 @@ public class WeaponProjectile : Weapon
             RaiseFired();
             RaiseAmmoChanged();
         }
+
+        // Let the rest of the throw animation play (the cooldown is the length of the throw)
+        float remaining = nextFireTime - Time.time;
+        if (remaining > 0f)
+            yield return new WaitForSeconds(remaining);
+
+        // Grab a new grenade/spear: play the draw animation again (blocks throwing until it finishes)
+        if (data.redrawAfterThrow && ReserveAmmo > 0)
+            PlayDraw();
 
         isThrowing = false;
     }

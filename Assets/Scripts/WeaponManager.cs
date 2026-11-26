@@ -65,10 +65,55 @@ public class WeaponManager : NetworkBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        // Ask the server to swap weapons
-        if (kb.digit1Key.wasPressedThisFrame) RequestSwapServerRpc(0);
-        if (kb.digit2Key.wasPressedThisFrame) RequestSwapServerRpc(1);
-        if (kb.digit3Key.wasPressedThisFrame) RequestSwapServerRpc(2);
+        // Ask the server to swap weapons (weapons that can't be equipped right now, e.g. empty grenades, are skipped)
+        if (kb.digit1Key.wasPressedThisFrame) TrySwap(0);
+        if (kb.digit2Key.wasPressedThisFrame) TrySwap(1);
+        if (kb.digit3Key.wasPressedThisFrame) TrySwap(2);
+
+        // A used-up grenade / spear puts itself away and you go back to your previous weapon
+        Weapon active = ActiveWeapon;
+        if (active != null && active.WantsToUnequip && Time.time >= nextAutoSwapTime)
+        {
+            nextAutoSwapTime = Time.time + 0.5f; // don't spam requests while the swap is travelling to the server
+            SwapToFallback();
+        }
+    }
+
+    private int previousSlot = -1;
+    private float nextAutoSwapTime;
+
+    private void TrySwap(int slot)
+    {
+        if (slot < 0 || slot >= inventory.Length || slot == activeSlotIndex.Value) return;
+
+        Weapon target = inventory[slot];
+        // Ammo lives on the owner's copy of the weapon, so this check has to happen here, not on the server
+        if (target == null || !target.CanEquip) return;
+
+        previousSlot = activeSlotIndex.Value;
+        RequestSwapServerRpc(slot);
+    }
+
+    private void SwapToFallback()
+    {
+        int current = activeSlotIndex.Value;
+
+        // Previous weapon first, then any other weapon that can be equipped
+        if (previousSlot >= 0 && previousSlot != current
+            && inventory[previousSlot] != null && inventory[previousSlot].CanEquip)
+        {
+            TrySwap(previousSlot);
+            return;
+        }
+
+        for (int i = 0; i < inventory.Length; i++)
+        {
+            if (i != current && inventory[i] != null && inventory[i].CanEquip)
+            {
+                TrySwap(i);
+                return;
+            }
+        }
     }
 
     [Rpc(SendTo.Server)]

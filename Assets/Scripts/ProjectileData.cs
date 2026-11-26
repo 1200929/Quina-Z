@@ -63,6 +63,10 @@ public class ProjectileData : WeaponData
     [Header("Ammo & timing")]
     public int startingAmmo = 2;
     public int maxAmmo = 4;
+    [Tooltip("Can this weapon be pulled out with 0 ammo? Tick for a bow, untick for grenades and spears.")]
+    public bool canEquipWhenEmpty = true;
+    [Tooltip("Play the draw animation again after each throw. Untick for a bow that stays drawn.")]
+    public bool redrawAfterThrow = true;
     [Tooltip("Delay between pressing attack and the projectile leaving (match your throw/release animation).")]
     public float releaseDelay = 0.25f;
     [Tooltip("Time after pressing attack before you can use it again (nocking an arrow, drawing a new grenade).")]

@@ -36,6 +36,10 @@ public abstract class Weapon : NetworkBehaviour
 
     [Tooltip("Animator trigger parameters. Names must match your Animator Controller.")]
     public string drawTrigger = "Draw";
+    [Tooltip("Name of the Draw state in the Animator. The draw is played by jumping straight to this state, " +
+             "so it restarts every time (even if the Animator has no Any State > Draw transition). " +
+             "Leave empty to use the trigger only.")]
+    public string drawStateName = "Draw";
     public string reloadTrigger = "Reload";
     [Tooltip("Played on every shot / swing / throw.")]
     public string fireTrigger = "Fire";
@@ -161,6 +165,9 @@ public abstract class Weapon : NetworkBehaviour
     /// <summary>Call from ammo pickups / wall buys. Returns true if any ammo was added.</summary>
     public virtual bool AddAmmo(int amount) { return false; }
 
+    public virtual bool CanEquip => true;
+    public virtual bool WantsToUnequip => false;
+
     /// <summary>Text for the ammo HUD: "30 / 150" for guns, the item count for throwables, empty for melee.</summary>
     public virtual string GetAmmoText() => AmmoInMagazine + " / " + ReserveAmmo;
 
@@ -223,6 +230,32 @@ public abstract class Weapon : NetworkBehaviour
             yield return null;
     }
 
+    /// <summary>Plays the draw animation and sound again, e.g. after throwing a grenade to grab the next one.</summary>
+    protected void PlayDraw()
+    {
+        if (!isActiveAndEnabled || IsDrawing) return;
+        StartCoroutine(DrawRoutine());
+    }
+
+    private void PlayDrawAnimation()
+    {
+        if (animator == null) return;
+
+        // Jumping straight to the Draw state always restarts it, whatever state the animator is in
+        if (!string.IsNullOrEmpty(drawStateName))
+        {
+            int stateHash = Animator.StringToHash(drawStateName);
+            if (animator.HasState(0, stateHash))
+            {
+                animator.Play(stateHash, 0, 0f);
+                return;
+            }
+            Debug.LogWarning($"{name}: the Animator has no state called '{drawStateName}'. Using the '{drawTrigger}' trigger instead.", this);
+        }
+
+        SetTrigger(drawTrigger);
+    }
+
     private IEnumerator DrawRoutine()
     {
         IsDrawing = true;
@@ -234,7 +267,7 @@ public abstract class Weapon : NetworkBehaviour
         if (animator != null)
         {
             ResetAnimatorTriggers();
-            SetTrigger(drawTrigger);
+            PlayDrawAnimation();
             yield return WaitForAnimation(drawTag, 0f);
         }
         IsDrawing = false;

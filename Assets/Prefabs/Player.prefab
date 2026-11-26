@@ -603,8 +603,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   weaponHolder: {fileID: 6083736677602633262}
   startingWeapons:
-  - {fileID: 5685023107342810759, guid: 56143726dd5eb6748948ac07ae570db1, type: 3}
   - {fileID: -6601968451723406631, guid: c13a3f2d1d85eb647b55b74904f72eb1, type: 3}
+  - {fileID: 5685023107342810759, guid: 56143726dd5eb6748948ac07ae570db1, type: 3}
+  - {fileID: 1965139093139232967, guid: a811ac46e3b0d80439ab8f92ab50e127, type: 3}
   viewmodelLayerName: Viewmodel
   activeSlotIndex:
     UpdateTraits:
@@ -624,8 +625,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 6
+  walkSpeed: 4.5
   gravity: -9.81
+  sprintMultiplier: 1.6
+  maxStamina: 100
+  staminaDrainPerSecond: 25
+  staminaRegenPerSecond: 15
+  staminaRegenDelay: 1
+  minStaminaToResume: 20
   playerCamera: {fileID: 4334808552682291568}
   mouseSensitivity: 0.1
 --- !u!114 &3317857556770647924
