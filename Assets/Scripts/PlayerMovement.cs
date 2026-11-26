@@ -9,10 +9,30 @@ public class PlayerMovement : NetworkBehaviour
     private PlayerInputActions inputActions;
 
     [Header("Movimento")]
-    public float speed = 6f;
+    [Tooltip("Velocidade a andar (antes era 6).")]
+    public float walkSpeed = 4.5f;
     public float gravity = -9.81f;
     private Vector2 moveInput;
     private Vector3 velocity;
+
+    [Header("Sprint (Shift esquerdo)")]
+    [Tooltip("Multiplicador da velocidade a correr (4.5 x 1.6 = 7.2).")]
+    public float sprintMultiplier = 1.6f;
+    public float maxStamina = 100f;
+    [Tooltip("Stamina gasta por segundo a correr (25 = cerca de 4 s de sprint).")]
+    public float staminaDrainPerSecond = 25f;
+    [Tooltip("Stamina recuperada por segundo quando não corres.")]
+    public float staminaRegenPerSecond = 15f;
+    [Tooltip("Segundos sem correr antes de a stamina começar a recuperar.")]
+    public float staminaRegenDelay = 1f;
+    [Tooltip("Depois de esgotar a stamina, só voltas a correr quando ela chegar a este valor.")]
+    public float minStaminaToResume = 20f;
+
+    private float stamina;
+    private bool isSprinting;
+    private bool exhausted;
+    private float regenTimer;
+    private StaminaHUD staminaHUD;
 
     [Header("Camara / Olhar")]
     public Transform playerCamera;
@@ -27,13 +47,11 @@ public class PlayerMovement : NetworkBehaviour
     {
         controller = GetComponent<CharacterController>();
         weaponManager = GetComponent<WeaponManager>();
-        //INPUT SYSTEM
-
+        stamina = maxStamina;
     }
 
     private void OnEnable()
     {
-        // 1. Unity checks: "Does inputActions exist?"
         if (inputActions == null)
         {
             inputActions = new PlayerInputActions();
@@ -54,10 +72,19 @@ public class PlayerMovement : NetworkBehaviour
         {
             inputActions.Player.Disable();
         }
+
+        // Se o jogador morrer a correr, a barra não fica presa no ecrã
+        if (staminaHUD != null) staminaHUD.Show(false);
     }
+
     public override void OnNetworkSpawn()
     {
-        if (IsOwner) return;
+        if (IsOwner)
+        {
+            // A barra de sprint é só do jogador local
+            staminaHUD = FindAnyObjectByType<StaminaHUD>();
+            return;
+        }
 
         // Este jogador pertence a outra pessoa: sem input, sem câmara, sem arma
         enabled = false;
@@ -87,6 +114,7 @@ public class PlayerMovement : NetworkBehaviour
         if (activeWeapon != null) activeWeapon.IsMoving = moveInput.sqrMagnitude > 0.01f;
 
         HandleLook();
+        HandleSprint();
         HandleMovement();
     }
 
@@ -109,12 +137,47 @@ public class PlayerMovement : NetworkBehaviour
         transform.Rotate(Vector3.up * mouseX);
     }
 
+    private void HandleSprint()
+    {
+        var kb = Keyboard.current;
+        bool wantsSprint = kb != null && kb.leftShiftKey.isPressed;
+        bool movingForward = moveInput.y > 0.1f; // só corres para a frente
+
+        // Esgotaste a stamina: só voltas a correr quando recuperares um mínimo
+        if (exhausted && stamina >= minStaminaToResume) exhausted = false;
+
+        isSprinting = wantsSprint && movingForward && !exhausted && stamina > 0f;
+
+        if (isSprinting)
+        {
+            stamina = Mathf.Max(0f, stamina - staminaDrainPerSecond * Time.deltaTime);
+            regenTimer = staminaRegenDelay;
+
+            if (stamina <= 0f) exhausted = true;
+        }
+        else
+        {
+            if (regenTimer > 0f)
+                regenTimer -= Time.deltaTime;
+            else
+                stamina = Mathf.Min(maxStamina, stamina + staminaRegenPerSecond * Time.deltaTime);
+        }
+
+        // A barra fica visível enquanto corres ou a recuperar, e só desaparece quando está cheia
+        if (staminaHUD != null)
+        {
+            staminaHUD.SetValue(stamina / maxStamina);
+            staminaHUD.Show(isSprinting || stamina < maxStamina);
+        }
+    }
+
     private void HandleMovement()
     {
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         Weapon weapon = ActiveWeapon;
         float weaponSpeed = weapon != null ? weapon.MovementSpeedMultiplier : 1f; // heavier weapons slow you down
-        controller.Move(move * speed * weaponSpeed * Time.deltaTime);
+        float currentSpeed = walkSpeed * (isSprinting ? sprintMultiplier : 1f);
+        controller.Move(move * currentSpeed * weaponSpeed * Time.deltaTime);
 
         //GRAVIDADE
         if (controller.isGrounded && velocity.y < 0)
