@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3307da69b2220484883eb2787d41eb74, type: 3}
+  m_Name: blunderbuss
+  m_EditorClassIdentifier: Assembly-CSharp::FirearmData
+  weaponName: Hand Cannon
+  damage: 12
+  impactForce: 1050
+  movementSpeedMultiplier: 0.85
+  attackSound: {fileID: 0}
+  drawSound: {fileID: 0}
+  pellets: 12
+  range: 125
+  damageAtMaxRange: 0.35
+  falloffStartDistance: 25
+  penetrableLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxWallThickness: 0.1
+  wallDamageRetained: 0.2
+  maxTargetPenetrations: 3
+  targetDamageRetained: 0.4
+  fireMode: 0
+  fireRate: 600
+  burstCount: 3
+  burstCooldown: 0.25
+  autoReload: 1
+  lastShotReloadDelay: 0.35
+  magazineSize: 1
+  spareMagazines: 20
+  maxSpareMagazines: 35
+  reloadMode: 0
+  reloadTime: 6.67
+  shellReloadStartTime: 0.4
+  shellInsertTime: 0.5
+  shellReloadEndTime: 0.4
+  canFireInterruptReload: 0
+  spreadStationary: 3.5
+  spreadMoving: 5.5
+  spreadWorsenTime: 0.15
+  spreadRecoverTime: 0.2
+  bloomPerShot: 3
+  maxBloom: 5
+  bloomRecovery: 7
+  recoilPitchMin: 16
+  recoilPitchMax: 18
+  recoilYawMin: -5.5
+  recoilYawMax: 5.5
+  recoilRecoverySpeed: 4
+  recoilRecoveryDelay: 0.25
+  useFireDelay: 0
+  fireDelay: 0.44
+  reloadSound: {fileID: 0}
+  emptySound: {fileID: 0}

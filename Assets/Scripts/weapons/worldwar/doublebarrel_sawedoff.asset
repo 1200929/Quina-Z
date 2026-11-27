@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3307da69b2220484883eb2787d41eb74, type: 3}
+  m_Name: doublebarrel_sawedoff
+  m_EditorClassIdentifier: Assembly-CSharp::FirearmData
+  weaponName: Sawed-Off Shotgun
+  damage: 18
+  impactForce: 500
+  movementSpeedMultiplier: 1
+  attackSound: {fileID: 8300000, guid: fdc89039631020d49b165dc363694119, type: 3}
+  drawSound: {fileID: 8300000, guid: 7d4f171a41a04df4d98efb4f269da8db, type: 3}
+  pellets: 16
+  range: 200
+  damageAtMaxRange: 0.45
+  falloffStartDistance: 15
+  penetrableLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxWallThickness: 0.1
+  wallDamageRetained: 0.25
+  maxTargetPenetrations: 5
+  targetDamageRetained: 0.85
+  fireMode: 1
+  fireRate: 800
+  burstCount: 3
+  burstCooldown: 0.25
+  autoReload: 1
+  lastShotReloadDelay: 0.35
+  magazineSize: 2
+  spareMagazines: 20
+  maxSpareMagazines: 26
+  reloadMode: 0
+  reloadTime: 2.08
+  shellReloadStartTime: 0.4
+  shellInsertTime: 0.5
+  shellReloadEndTime: 0.4
+  canFireInterruptReload: 1
+  spreadStationary: 20
+  spreadMoving: 50
+  spreadWorsenTime: 0.05
+  spreadRecoverTime: 0.05
+  bloomPerShot: 2
+  maxBloom: 4
+  bloomRecovery: 10
+  recoilPitchMin: 2.5
+  recoilPitchMax: 3
+  recoilYawMin: -1.8
+  recoilYawMax: 1.8
+  recoilRecoverySpeed: 12
+  recoilRecoveryDelay: 0.25
+  useFireDelay: 0
+  fireDelay: 0.1
+  reloadSound: {fileID: 8300000, guid: 59829b2d1661e5e48a91f97388b965bb, type: 3}
+  emptySound: {fileID: 8300000, guid: 556d4aefdb794aa4d8c1ee7ad9582879, type: 3}
