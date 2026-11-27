@@ -10,7 +10,7 @@ public class DamageFlashHUD : MonoBehaviour
     [Tooltip("Onde o vermelho começa, do centro (0) aos cantos (1). Mais alto = só nos cantos.")]
     [Range(0.1f, 0.9f)] public float innerRadius = 0.5f;
 
-    [Header("Intensidade")]
+    [Header("Flash ao levar dano")]
     [Tooltip("Opacidade do flash para o dano mais pequeno.")]
     [Range(0f, 1f)] public float minFlashAlpha = 0.25f;
     [Tooltip("Opacidade máxima do flash.")]
@@ -20,10 +20,37 @@ public class DamageFlashHUD : MonoBehaviour
     [Tooltip("Segundos que o flash máximo demora a desaparecer.")]
     public float fadeDuration = 0.6f;
 
+    [Header("Vida baixa")]
+    [Tooltip("Fração de vida (0 a 1) a partir da qual o aviso aparece. Com 45 % e 100 de vida, aparece aos 45.")]
+    [Range(0.05f, 1f)] public float lowHealthThreshold = 0.45f;
+    [Tooltip("Opacidade mínima do vermelho a pulsar.")]
+    [Range(0f, 1f)] public float lowMinAlpha = 0.15f;
+    [Tooltip("Opacidade máxima do vermelho a pulsar.")]
+    [Range(0f, 1f)] public float lowMaxAlpha = 0.45f;
+    [Tooltip("Velocidade do pulso quando a vida está no limiar (radianos por segundo).")]
+    public float pulseSpeedAtThreshold = 4f;
+    [Tooltip("Velocidade do pulso quando a vida está quase a zero.")]
+    public float pulseSpeedAtZero = 9f;
+    [Tooltip("Segundos que o aviso demora a aparecer e a desaparecer.")]
+    public float lowHealthFadeTime = 0.5f;
+
+    [Header("Batimento cardíaco (opcional)")]
+    [Tooltip("Som em loop que toca enquanto a vida está baixa. Deixa vazio para não ter som.")]
+    public AudioClip heartbeatClip;
+    [Range(0f, 1f)] public float heartbeatVolume = 0.6f;
+
+    [Header("Debug")]
+    [Tooltip("Liga isto durante o Play para veres o aviso de vida baixa sem levares dano.")]
+    public bool previewLowHealth;
+
     private RawImage image;
     private Texture2D vignetteTexture;
+    private AudioSource heartbeat;
     private PlayerHealth health;
-    private float flash;
+
+    private float flash;       // intensidade do flash de dano
+    private float lowBlend;    // 0 = sem aviso, 1 = aviso completo
+    private float pulsePhase;
 
     private void Awake()
     {
@@ -32,6 +59,16 @@ public class DamageFlashHUD : MonoBehaviour
         vignetteTexture = BuildVignetteTexture();
         image.texture = vignetteTexture;
         SetAlpha(0f);
+
+        if (heartbeatClip != null)
+        {
+            heartbeat = gameObject.AddComponent<AudioSource>();
+            heartbeat.clip = heartbeatClip;
+            heartbeat.loop = true;
+            heartbeat.playOnAwake = false;
+            heartbeat.spatialBlend = 0f;      // som 2D
+            heartbeat.volume = 0f;
+        }
     }
 
     private void OnDestroy()
@@ -44,11 +81,17 @@ public class DamageFlashHUD : MonoBehaviour
     {
         if (health == null) TryBind();
 
+        float dt = Time.unscaledDeltaTime;
+
+        // 1) Flash ao levar dano
         if (flash > 0f)
-        {
-            flash = Mathf.MoveTowards(flash, 0f, (maxFlashAlpha / fadeDuration) * Time.unscaledDeltaTime);
-            SetAlpha(flash);
-        }
+            flash = Mathf.MoveTowards(flash, 0f, (maxFlashAlpha / Mathf.Max(0.01f, fadeDuration)) * dt);
+
+        // 2) Aviso de vida baixa
+        float lowAlpha = UpdateLowHealth(dt);
+
+        // Mostra o mais forte dos dois
+        SetAlpha(Mathf.Max(flash, lowAlpha));
     }
 
     // Espera pelo jogador local e liga-se à vida dele
@@ -72,7 +115,45 @@ public class DamageFlashHUD : MonoBehaviour
         float t = Mathf.Clamp01(damage / damageForMaxFlash);
         float target = Mathf.Lerp(minFlashAlpha, maxFlashAlpha, t);
         flash = Mathf.Max(flash, target);     // vários golpes seguidos não "apagam" o flash
-        SetAlpha(flash);
+    }
+
+    // Devolve a opacidade do aviso de vida baixa
+    private float UpdateLowHealth(float dt)
+    {
+        // Fração de vida atual (0 a 1). Sem jogador ligado, considera-se vida cheia.
+        float fraction = 1f;
+        if (health != null && health.maxHealth > 0f)
+            fraction = Mathf.Clamp01(health.currentHealth.Value / health.maxHealth);
+        if (previewLowHealth) fraction = lowHealthThreshold * 0.5f;
+
+        bool isLow = fraction <= lowHealthThreshold;
+        bool isDead = fraction <= 0f;
+
+        lowBlend = Mathf.MoveTowards(lowBlend, isLow ? 1f : 0f, dt / Mathf.Max(0.01f, lowHealthFadeTime));
+
+        UpdateHeartbeat(isDead);
+
+        if (lowBlend <= 0f) return 0f;
+
+        // Morto: vermelho fixo, sem pulsar
+        if (isDead) return lowMaxAlpha * lowBlend;
+
+        // Quanto menos vida, mais depressa pulsa
+        float severity = 1f - Mathf.Clamp01(fraction / lowHealthThreshold);
+        pulsePhase += Mathf.Lerp(pulseSpeedAtThreshold, pulseSpeedAtZero, severity) * dt;
+        float pulse = Mathf.Sin(pulsePhase) * 0.5f + 0.5f;
+        return Mathf.Lerp(lowMinAlpha, lowMaxAlpha, pulse) * lowBlend;
+    }
+
+    private void UpdateHeartbeat(bool isDead)
+    {
+        if (heartbeat == null) return;
+
+        float volume = isDead ? 0f : heartbeatVolume * lowBlend;
+        heartbeat.volume = volume;
+
+        if (volume > 0.01f && !heartbeat.isPlaying) heartbeat.Play();
+        else if (volume <= 0.01f && heartbeat.isPlaying) heartbeat.Stop();
     }
 
     private void SetAlpha(float alpha)
@@ -109,6 +190,5 @@ public class DamageFlashHUD : MonoBehaviour
     private void TestFlash()
     {
         flash = maxFlashAlpha;
-        SetAlpha(flash);
     }
 }
