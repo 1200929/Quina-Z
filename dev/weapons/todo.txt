@@ -1,14 +1,17 @@
 //DONE
-g3a3
-ar10
 mp5
 handcannon
-holy_handgrenade
-
-//RIGGED
 sawedoff_doublebarrel_shotgun
+
+//missing sound
+g3a3
+g3a3_upgraded
+ar10
+holy_handgrenade
 glock17
 blunderbuss
+
+//RIGGED
 sword_puzzle (d afonso henriques)
 
 //MODELS
@@ -23,11 +26,11 @@ kar98k
 
 //UP NEXT
 pá de padeiro
-axe
+axe (pa anims)
 dagger
 spear
 polearm
-greatsword
+greatsword (puzzle sword anims)
 
 p08
 c96

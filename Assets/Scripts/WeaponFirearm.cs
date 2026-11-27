@@ -39,6 +39,7 @@ public class WeaponFirearm : Weapon
 
     private bool isShotPending;
     private Coroutine delayedFireRoutine;
+    private Coroutine autoReloadRoutine;
 
     private readonly HashSet<IDamageable> hitThisShot = new HashSet<IDamageable>();
 
@@ -53,6 +54,7 @@ public class WeaponFirearm : Weapon
     {
         isBursting = false;
         reloadRoutine = null;
+        autoReloadRoutine = null;
     }
 
     protected override void ResetAnimatorTriggers()
@@ -167,7 +169,7 @@ public class WeaponFirearm : Weapon
         {
             PlaySound(data.emptySound);
             nextFireTime = Time.time + 0.25f;
-            AutoReloadIfEmpty();
+            AutoReloadIfEmpty(false);
             return;
         }
 
@@ -202,7 +204,7 @@ public class WeaponFirearm : Weapon
 
         if (isActiveAndEnabled && !IsReloading && !IsDrawing && AmmoInMagazine > 0)
         {
-            FireShot();
+            FireShot(false); // the animation is already playing
             AutoReloadIfEmpty();
         }
 
@@ -241,12 +243,33 @@ public class WeaponFirearm : Weapon
         AutoReloadIfEmpty();
     }
 
-    private void AutoReloadIfEmpty()
+    /// <param name="afterShot">True when called right after firing: the reload then waits for the fire animation.</param>
+    private void AutoReloadIfEmpty(bool afterShot = true)
     {
-        if (data.autoReload && AmmoInMagazine <= 0) TryReload();
+        if (!data.autoReload || AmmoInMagazine > 0) return;
+
+        if (!afterShot || data.lastShotReloadDelay <= 0f)
+        {
+            TryReload();
+            return;
+        }
+
+        if (autoReloadRoutine == null)
+            autoReloadRoutine = StartCoroutine(AutoReloadAfterLastShotRoutine());
     }
 
-    private void FireShot()
+    private IEnumerator AutoReloadAfterLastShotRoutine()
+    {
+        // Starting the reload resets the animator triggers. Doing that in the same frame as the shot
+        // wipes the Fire trigger before the animator sees it, so the last round never plays its fire animation.
+        yield return new WaitForSeconds(data.lastShotReloadDelay);
+
+        autoReloadRoutine = null;
+        if (AmmoInMagazine <= 0) TryReload();
+    }
+
+    /// <param name="playAnimation">False for delayed shots: their fire animation already started when the trigger was pressed.</param>
+    private void FireShot(bool playAnimation = true)
     {
         AmmoInMagazine--;
 
@@ -257,7 +280,7 @@ public class WeaponFirearm : Weapon
         bloom = Mathf.Min(data.maxBloom, bloom + data.bloomPerShot);
         ApplyRecoil();
 
-        SetTrigger(fireTrigger);
+        if (playAnimation) SetTrigger(fireTrigger);
         PlaySound(data.attackSound);
         RaiseFired();
         RaiseAmmoChanged();
@@ -379,13 +402,12 @@ public class WeaponFirearm : Weapon
     private IEnumerator MagazineReloadRoutine()
     {
         IsReloading = true;
-        PlaySound(data.reloadSound);
         RaiseReloadStarted();
 
         ResetAnimatorTriggers();
         SetTrigger(reloadTrigger);
         // With an Animator the animation decides the duration; otherwise reloadTime is used
-        yield return WaitForAnimation(reloadTag, data.reloadTime);
+        yield return WaitForAnimation(reloadTag, data.reloadTime, () => PlaySound(data.reloadSound));
 
         int needed = data.magazineSize - AmmoInMagazine;
         int taken = Mathf.Min(needed, ReserveAmmo);

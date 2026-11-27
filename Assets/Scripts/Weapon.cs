@@ -133,6 +133,9 @@ public abstract class Weapon : NetworkBehaviour
         IsReloading = false;
         ResetState();
         ResetAnimatorTriggers();
+
+        // Cut any sound still playing (gunshot tail, reload, draw...) when switching away
+        if (audioSource != null) audioSource.Stop();
     }
 
     private void Update()
@@ -204,10 +207,11 @@ public abstract class Weapon : NetworkBehaviour
     /// Waits until the animation tagged 'tag' has started and then finished.
     /// If the animator never enters it (trigger/tag not set up), logs a warning and waits 'fallbackSeconds' instead.
     /// </summary>
-    protected IEnumerator WaitForAnimation(string tag, float fallbackSeconds)
+    protected IEnumerator WaitForAnimation(string tag, float fallbackSeconds, Action onStarted = null)
     {
         if (animator == null)
         {
+            onStarted?.Invoke();
             if (fallbackSeconds > 0f) yield return new WaitForSeconds(fallbackSeconds);
             yield break;
         }
@@ -216,16 +220,18 @@ public abstract class Weapon : NetworkBehaviour
         while (!AnimatorInTag(tag))
         {
             waited += Time.deltaTime;
-            if (waited > 0.5f)
+            if (waited > 1.5f) // generous: the previous animation (e.g. a long fire anim) may still be finishing
             {
                 Debug.LogWarning($"{name}: animator never entered a state tagged '{tag}'. " +
                                  "Check the trigger name, the transition and the state's Tag.", this);
+                onStarted?.Invoke();
                 if (fallbackSeconds > 0f) yield return new WaitForSeconds(fallbackSeconds);
                 yield break;
             }
             yield return null;
         }
 
+        onStarted?.Invoke(); // the animation has really started now
         while (AnimatorInTag(tag))
             yield return null;
     }

@@ -108,11 +108,27 @@ public class GameManager : NetworkBehaviour
         if (restarting) return;
         restarting = true;
 
+        DespawnAllZombies();
+
         var manager = NetworkManager.Singleton;
 
         // Static handler on purpose: this object is destroyed by the scene reload, the handler must survive it
         manager.SceneManager.OnLoadEventCompleted += RespawnPlayersAfterLoad;
         manager.SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+    }
+
+    /// <summary>
+    /// Removes every zombie still alive. Zombies are spawned at runtime and Netcode keeps runtime-spawned objects
+    /// across a scene reload (unless they were spawned 'with scene'), so they have to be removed by hand.
+    /// </summary>
+    private static void DespawnAllZombies()
+    {
+        foreach (ZombieHealth zombie in FindObjectsByType<ZombieHealth>(FindObjectsSortMode.None))
+        {
+            NetworkObject networkObject = zombie.GetComponent<NetworkObject>();
+            if (networkObject != null && networkObject.IsSpawned)
+                networkObject.Despawn(true);
+        }
     }
 
     /// <summary>

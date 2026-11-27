@@ -37,6 +37,8 @@ public class FirearmData : WeaponData
     public float burstCooldown = 0.25f;
     [Tooltip("Start reloading automatically when the magazine runs empty.")]
     public bool autoReload = true;
+    [Tooltip("Seconds between firing the last round and the automatic reload starting, so the fire animation can play first. 0 = reload immediately.")]
+    public float lastShotReloadDelay = 0.35f;
 
     [Header("Ammo")]
     public int magazineSize = 30;

@@ -603,8 +603,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   weaponHolder: {fileID: 6083736677602633262}
   startingWeapons:
-  - {fileID: -6046859839870491681, guid: 0adb7653f81aa464aa9b9adb6014b40d, type: 3}
-  - {fileID: -6601968451723406631, guid: c13a3f2d1d85eb647b55b74904f72eb1, type: 3}
+  - {fileID: 3990994299670532730, guid: 9302cd174d43b1444b9bf4569889922b, type: 3}
+  - {fileID: 5712255810809184627, guid: 17e7fa63f19c1ab488c429101edc55de, type: 3}
   - {fileID: 1965139093139232967, guid: a811ac46e3b0d80439ab8f92ab50e127, type: 3}
   playerAudioSource: {fileID: 8039334168045396443}
   playerCamera: {fileID: 5389514998902060546}

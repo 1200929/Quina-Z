@@ -15,9 +15,9 @@ MonoBehaviour:
   weaponName: Hand Cannon
   damage: 8
   impactForce: 850
-  movementSpeedMultiplier: 1
-  attackSound: {fileID: 0}
-  drawSound: {fileID: 0}
+  movementSpeedMultiplier: 0.8
+  attackSound: {fileID: 8300000, guid: 182163d498c5ce843a58e9fdaa1b070c, type: 3}
+  drawSound: {fileID: 8300000, guid: 290529b6e4f52bb4c8c97c40a0820fa1, type: 3}
   pellets: 18
   range: 80
   damageAtMaxRange: 0
@@ -34,6 +34,7 @@ MonoBehaviour:
   burstCount: 3
   burstCooldown: 0.25
   autoReload: 1
+  lastShotReloadDelay: 0.35
   magazineSize: 1
   spareMagazines: 25
   maxSpareMagazines: 30
@@ -58,5 +59,5 @@ MonoBehaviour:
   recoilRecoveryDelay: 0.2
   useFireDelay: 1
   fireDelay: 0.44
-  reloadSound: {fileID: 0}
-  emptySound: {fileID: 0}
+  reloadSound: {fileID: 8300000, guid: e4297dccdc9125043ad2feed3e51c9f6, type: 3}
+  emptySound: {fileID: 8300000, guid: 94f4082b7146f104ea966ae9923f3854, type: 3}
