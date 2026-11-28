@@ -6,9 +6,10 @@ using UnityEngine;
 /// </summary>
 public abstract class WeaponData : ScriptableObject
 {
-    [Header("General")]
+    [Header("HUD")]
     [Tooltip("Name shown on the HUD.")]
     public string weaponName = "Weapon";
+    public Sprite icon;
 
     [Header("Damage")]
     [Tooltip("Damage per bullet/pellet (firearm), per hit (melee) or on direct hit (projectile).")]

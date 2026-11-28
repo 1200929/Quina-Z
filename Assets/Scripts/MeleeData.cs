@@ -38,4 +38,14 @@ public class MeleeData : WeaponData
     public int maxTargetsPerSwing = 0;
     [Tooltip("Keep attacking while the button is held.")]
     public bool holdToAttack = false;
+
+    [Tooltip("The swing ends the moment it hits an enemy or a wall: no more rays, and the swing sound is cut off " +
+             "(the hit sounds still play).")]
+    public bool stopSwingOnHit = false;
+
+    [Header("Hit sounds (optional, played at the point of impact; attackSound plays on the swing itself)")]
+    [Tooltip("Played when the swing damages an enemy.")]
+    public AudioClip hitEnemySound;
+    [Tooltip("Played when the swing hits a wall or other surface (once per swing).")]
+    public AudioClip hitWallSound;
 }

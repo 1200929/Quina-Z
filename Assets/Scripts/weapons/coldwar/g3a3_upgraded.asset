@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: g3a3_upgraded
   m_EditorClassIdentifier: Assembly-CSharp::FirearmData
   weaponName: Upgraded G3A3
+  icon: {fileID: 21300000, guid: 753a2797de60fc446b549a4489e80d95, type: 3}
   damage: 32
   impactForce: 350
   movementSpeedMultiplier: 0.8
@@ -34,6 +35,7 @@ MonoBehaviour:
   burstCount: 3
   burstCooldown: 0.33
   autoReload: 1
+  lastShotReloadDelay: 0.35
   magazineSize: 30
   spareMagazines: 5
   maxSpareMagazines: 8

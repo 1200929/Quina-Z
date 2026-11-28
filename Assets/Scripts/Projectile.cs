@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -18,6 +16,14 @@ public class Projectile : NetworkBehaviour
     [Tooltip("Spawned on every client when the projectile explodes (particles + sound).")]
     public GameObject explosionEffect;
     public float explosionEffectLifetime = 5f;
+
+    [Header("Debug")]
+    [Tooltip("Draw the flight path (cyan), impact points (yellow) and the explosion (red sphere, green lines to targets hit, " +
+             "gray lines to targets shielded by a wall). Drawn on the host. Visible in the Scene view, " +
+             "and in the Game view with Gizmos on.")]
+    public bool drawDebug = true;
+    [Tooltip("Seconds the debug lines stay on screen.")]
+    public float debugDuration = 5f;
 
     private ProjectileData data;
     private Vector3 velocity;
@@ -88,6 +94,8 @@ public class Projectile : NetworkBehaviour
         if (length < 0.00001f) return;
         Vector3 dir = step / length;
 
+        Vector3 start = transform.position;
+
         if (Sweep(dir, length, out RaycastHit hit))
         {
             transform.position += dir * hit.distance; // move to the point of contact
@@ -97,6 +105,8 @@ public class Projectile : NetworkBehaviour
         {
             transform.position += step;
         }
+
+        DebugLine(start, transform.position, Color.cyan); // the path it takes
 
         if (!stuck && !resting && !finished && data.alignToVelocity && velocity.sqrMagnitude > 0.01f)
             transform.rotation = Quaternion.LookRotation(velocity);
@@ -134,6 +144,7 @@ public class Projectile : NetworkBehaviour
     private void HandleHit(RaycastHit hit, Vector3 dir)
     {
         Vector3 normal = hit.normal == Vector3.zero ? -dir : hit.normal;
+        DebugPoint(hit.point, Color.yellow); // every impact
         IDamageable target = Weapon.FindDamageable(hit.collider);
 
         if (target != null)
@@ -219,6 +230,8 @@ public class Projectile : NetworkBehaviour
     {
         if (finished) return;
 
+        DebugSphere(center, data.explosionRadius, Color.red);
+        DebugPoint(center, Color.red);
         DoExplosionDamage(center);
 
         if (IsSpawned) ExplosionEffectRpc(center);
@@ -257,7 +270,12 @@ public class Projectile : NetworkBehaviour
             Vector3 point = entry.Value.point;
             float distance = entry.Value.distance;
 
-            if (data.explosionNeedsLineOfSight && IsBlocked(center, point)) continue;
+            if (data.explosionNeedsLineOfSight && IsBlocked(center, point))
+            {
+                DebugLine(center, point, Color.gray); // shielded by a wall
+                continue;
+            }
+            DebugLine(center, point, Color.green);    // takes damage
 
             float t = Mathf.Clamp01(distance / data.explosionRadius);
             float damage = data.explosionDamage * Mathf.Lerp(1f, data.explosionDamageAtEdge, t);
@@ -307,6 +325,52 @@ public class Projectile : NetworkBehaviour
         if (explosionEffect == null) return;
         GameObject fx = Instantiate(explosionEffect, position, Quaternion.identity);
         Destroy(fx, explosionEffectLifetime);
+    }
+
+    // ---------------------------------------------------------------- Debug drawing
+    // Wire sphere around a live projectile that will explode (Scene view, or Game view with Gizmos on)
+    private void OnDrawGizmos()
+    {
+        if (!drawDebug || !launched || finished || data == null) return;
+        if (data.explosionTrigger == ExplosionTrigger.None || data.explosionRadius <= 0f) return;
+
+        Gizmos.color = new Color(1f, 0.2f, 0.2f, 0.4f);
+        Gizmos.DrawWireSphere(transform.position, data.explosionRadius);
+    }
+
+    private void DebugLine(Vector3 from, Vector3 to, Color color)
+    {
+        if (drawDebug) Debug.DrawLine(from, to, color, debugDuration);
+    }
+
+    private void DebugPoint(Vector3 point, Color color)
+    {
+        if (!drawDebug) return;
+        const float size = 0.15f;
+        Debug.DrawLine(point - Vector3.right * size, point + Vector3.right * size, color, debugDuration);
+        Debug.DrawLine(point - Vector3.up * size, point + Vector3.up * size, color, debugDuration);
+        Debug.DrawLine(point - Vector3.forward * size, point + Vector3.forward * size, color, debugDuration);
+    }
+
+    private void DebugSphere(Vector3 center, float radius, Color color)
+    {
+        if (!drawDebug) return;
+        DebugCircle(center, Vector3.right, Vector3.up, radius, color);
+        DebugCircle(center, Vector3.right, Vector3.forward, radius, color);
+        DebugCircle(center, Vector3.up, Vector3.forward, radius, color);
+    }
+
+    private void DebugCircle(Vector3 center, Vector3 axisA, Vector3 axisB, float radius, Color color)
+    {
+        const int steps = 32;
+        Vector3 previous = center + axisA * radius;
+        for (int i = 1; i <= steps; i++)
+        {
+            float angle = i * Mathf.PI * 2f / steps;
+            Vector3 next = center + (axisA * Mathf.Cos(angle) + axisB * Mathf.Sin(angle)) * radius;
+            Debug.DrawLine(previous, next, color, debugDuration);
+            previous = next;
+        }
     }
 
     // ---------------------------------------------------------------- Cleanup

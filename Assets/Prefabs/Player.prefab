@@ -198,7 +198,7 @@ Camera:
     height: 1
   near clip plane: 0.05
   far clip plane: 1000
-  field of view: 70
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -446,11 +446,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1707697805930361295}
+  - component: {fileID: 6283676141654131756}
+  - component: {fileID: 3255967992558537605}
   - component: {fileID: 257776667019354294}
   - component: {fileID: 5589113514698877525}
   - component: {fileID: 1743791963409351772}
-  - component: {fileID: 6283676141654131756}
-  - component: {fileID: 3255967992558537605}
   - component: {fileID: 6096513308295810256}
   - component: {fileID: 3317857556770647924}
   - component: {fileID: -121770358692200848}
@@ -479,6 +479,59 @@ Transform:
   - {fileID: 2291683865840623865}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6283676141654131756
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8954746833129996662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1346488932
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  m_InScenePlacedDisabledByDefault: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  m_InScenePlaced: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &3255967992558537605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8954746833129996662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28e73a9f43d8274084f0edfc17806e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
+  ShowTopMostFoldoutHeaderGroup: 1
+  weaponHolder: {fileID: 6083736677602633262}
+  startingWeapons:
+  - {fileID: 5712255810809184627, guid: 17e7fa63f19c1ab488c429101edc55de, type: 3}
+  - {fileID: 8886863889923736824, guid: 294e596bc1e9be946a70917e0fdb0214, type: 3}
+  - {fileID: 1965139093139232967, guid: a811ac46e3b0d80439ab8f92ab50e127, type: 3}
+  playerAudioSource: {fileID: 8039334168045396443}
+  playerCamera: {fileID: 5389514998902060546}
+  viewmodelLayerName: Viewmodel
+  activeSlotIndex:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!33 &257776667019354294
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -561,59 +614,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &6283676141654131756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8954746833129996662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1346488932
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  m_InScenePlacedDisabledByDefault: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  m_InScenePlaced: 0
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
---- !u!114 &3255967992558537605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8954746833129996662}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f28e73a9f43d8274084f0edfc17806e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponManager
-  ShowTopMostFoldoutHeaderGroup: 1
-  weaponHolder: {fileID: 6083736677602633262}
-  startingWeapons:
-  - {fileID: 3990994299670532730, guid: 9302cd174d43b1444b9bf4569889922b, type: 3}
-  - {fileID: 5712255810809184627, guid: 17e7fa63f19c1ab488c429101edc55de, type: 3}
-  - {fileID: 1965139093139232967, guid: a811ac46e3b0d80439ab8f92ab50e127, type: 3}
-  playerAudioSource: {fileID: 8039334168045396443}
-  playerCamera: {fileID: 5389514998902060546}
-  viewmodelLayerName: Viewmodel
-  activeSlotIndex:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
 --- !u!114 &6096513308295810256
 MonoBehaviour:
   m_ObjectHideFlags: 0

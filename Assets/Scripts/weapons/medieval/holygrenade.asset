@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: holygrenade
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileData
   weaponName: Holy Hand Grenade
+  icon: {fileID: 21300000, guid: d375b7fb550c6f74ab319e162095746e, type: 3}
   damage: 20
   impactForce: 400
   movementSpeedMultiplier: 1
-  attackSound: {fileID: 0}
-  drawSound: {fileID: 0}
+  attackSound: {fileID: 8300000, guid: c6ee7965fb31b0944a2f06e5a99bb3a1, type: 3}
+  drawSound: {fileID: 8300000, guid: badccf0d3b7a00d49a623403c8747752, type: 3}
   projectilePrefab: {fileID: 1282159853098910772, guid: 9e4fcbf33ccc2734481401e69a71e4cd, type: 3}
   projectileSpeed: 20
   gravityScale: 1

@@ -2,17 +2,17 @@
 mp5
 handcannon
 sawedoff_doublebarrel_shotgun
+holy_handgrenade
+blunderbuss
+sword_puzzle (d afonso henriques)
 
 //missing sound
 g3a3
 g3a3_upgraded
 ar10
-holy_handgrenade
 glock17
-blunderbuss
 
 //RIGGED
-sword_puzzle (d afonso henriques)
 
 //MODELS
 sten

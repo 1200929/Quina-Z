@@ -23,6 +23,8 @@ public class WeaponManager : NetworkBehaviour
     public NetworkVariable<int> activeSlotIndex = new NetworkVariable<int>(0);
     private Weapon[] inventory = new Weapon[3];
 
+    public int ActiveSlot => activeSlotIndex.Value;
+
     /// <summary>The weapon currently in hand (null if the slot is empty).</summary>
     public Weapon ActiveWeapon
     {
@@ -31,6 +33,11 @@ public class WeaponManager : NetworkBehaviour
             int i = activeSlotIndex.Value;
             return i >= 0 && i < inventory.Length ? inventory[i] : null;
         }
+    }
+
+    public Weapon GetWeapon(int slot)
+    {
+        return slot >= 0 && slot < inventory.Length ? inventory[slot] : null;
     }
 
     private void Start()

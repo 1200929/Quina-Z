@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e97a3a088d45184ba5f7150c1cf50f2, type: 3}
+  m_Name: sword_puzzle
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeData
+  weaponName: Espada do D. Afonso Henriques
+  icon: {fileID: 21300000, guid: 451d08af03367844683026cb9309fe27, type: 3}
+  damage: 150
+  impactForce: 525
+  movementSpeedMultiplier: 1.1
+  attackSound: {fileID: 8300000, guid: f0eb9a32f2498f94ebe0bf59a1b0b43e, type: 3}
+  drawSound: {fileID: 8300000, guid: 84a51a14da590ad43b75570a81ded39d, type: 3}
+  range: 3
+  rayRadius: 0.15
+  arcStartYaw: 50
+  arcEndYaw: -50
+  arcStartPitch: -5
+  arcEndPitch: 5
+  hitDelay: 0.5
+  swingDuration: 0.13
+  rayInterval: 0.03
+  cooldown: 0.65
+  maxTargetsPerSwing: 0
+  holdToAttack: 1
+  stopSwingOnHit: 0
+  hitEnemySound: {fileID: 8300000, guid: 95e34772ccc06e646b5288a13c2a1a60, type: 3}
+  hitWallSound: {fileID: 8300000, guid: 56f776eee9e4e5b47985c7ea23bd866f, type: 3}

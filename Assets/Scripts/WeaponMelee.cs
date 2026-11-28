@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -24,6 +23,9 @@ public class WeaponMelee : Weapon
 
     // Server-side bookkeeping so one swing only damages each target once
     private int serverSwingId = -1;
+    private bool serverWallSoundPlayed;
+    private bool serverSwingStopped;
+    private int stoppedSwingId = -1; // on the attacking player: the swing that was cut short
     private readonly HashSet<IDamageable> serverHitThisSwing = new HashSet<IDamageable>();
 
     protected override void ResetState()
@@ -80,6 +82,7 @@ public class WeaponMelee : Weapon
             if (elapsed >= data.swingDuration) break;
 
             yield return new WaitForSeconds(interval);
+            if (stoppedSwingId == swingId) break; // something was hit, stop sending rays
             elapsed += interval;
         }
 
@@ -100,22 +103,86 @@ public class WeaponMelee : Weapon
         {
             serverSwingId = swingId;
             serverHitThisSwing.Clear();
+            serverWallSoundPlayed = false;
+            serverSwingStopped = false;
         }
+
+        if (serverSwingStopped) return; // an earlier ray already ended this swing
 
         if (data.maxTargetsPerSwing > 0 && serverHitThisSwing.Count >= data.maxTargetsPerSwing) return;
 
-        if (!TryGetHit(origin, dir, data.range, data.rayRadius, out RaycastHit hit)) return;
+        // The thick ray skips anything it starts inside of (e.g. standing right against a wall),
+        // which let swings reach zombies behind it. A thin ray finds the wall reliably.
+        bool thinFound = TryGetHit(origin, dir, data.range, 0f, out RaycastHit thin);
+        bool wallInTheWay = thinFound && FindDamageable(thin.collider) == null;
+
+        bool found = TryGetHit(origin, dir, data.range, data.rayRadius, out RaycastHit hit);
+
+        if (wallInTheWay && (!found || (FindDamageable(hit.collider) != null && hit.distance > thin.distance)))
+        {
+            hit = thin;   // the wall is closer than the target, so the target is behind it
+            found = true;
+        }
+
+        if (!found) return;
 
         IDamageable target = FindDamageable(hit.collider);
         if (target == null)
         {
+            if (!serverWallSoundPlayed)
+            {
+                serverWallSoundPlayed = true;
+                PlayHitSound(false, hit.point);
+            }
             RaiseHit(hit, false);
+            if (data.stopSwingOnHit) StopSwing(swingId);
             return;
         }
 
         if (!serverHitThisSwing.Add(target)) return; // already damaged by an earlier ray of this swing
 
         DealDamage(target, hit, dir, data.damage, DamageType.Melee);
+        PlayHitSound(true, hit.point);
         RaiseHit(hit, true);
+        if (data.stopSwingOnHit) StopSwing(swingId);
+    }
+
+    // ---------------------------------------------------------------- Stop swing on hit
+    private void StopSwing(int swingId)
+    {
+        serverSwingStopped = true;
+        if (IsSpawned) StopSwingRpc(swingId);
+        else OnSwingStopped(swingId);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void StopSwingRpc(int swingId)
+    {
+        OnSwingStopped(swingId);
+    }
+
+    private void OnSwingStopped(int swingId)
+    {
+        stoppedSwingId = swingId;                       // the attacking player's swing loop sees this and ends
+        if (audioSource != null) audioSource.Stop();    // cuts the swing sound; hit sounds use their own source
+    }
+
+    // ---------------------------------------------------------------- Hit sounds
+    private void PlayHitSound(bool enemy, Vector3 point)
+    {
+        if (IsSpawned) HitSoundRpc(enemy, point);
+        else PlayHitSoundLocal(enemy, point);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void HitSoundRpc(bool enemy, Vector3 point)
+    {
+        PlayHitSoundLocal(enemy, point);
+    }
+
+    private void PlayHitSoundLocal(bool enemy, Vector3 point)
+    {
+        AudioClip clip = enemy ? data.hitEnemySound : data.hitWallSound;
+        if (clip != null) AudioSource.PlayClipAtPoint(clip, point);
     }
 }

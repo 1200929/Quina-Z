@@ -31,6 +31,11 @@ public abstract class Weapon : NetworkBehaviour
              "Names of layers that don't exist are skipped.")]
     public string[] alwaysIgnoreLayers = { "Corpse", "Player" };
 
+    [Header("Debug")]
+    [Tooltip("Draw shots as lines for half a second: yellow = aim to max range, red = until it hit something, " +
+             "green = inside a wall it went through. Visible in the Scene view (and the Game view with Gizmos on).")]
+    public bool drawDebugRays = true;
+
     [Header("Animation (optional - leave the Animator empty to run without animations)")]
     public Animator animator;
 
@@ -339,6 +344,11 @@ public abstract class Weapon : NetworkBehaviour
         if (degrees <= 0f) return forward;
         Vector2 r = UnityEngine.Random.insideUnitCircle * Mathf.Tan(degrees * Mathf.Deg2Rad);
         return (forward + (rotation * Vector3.right) * r.x + (rotation * Vector3.up) * r.y).normalized;
+    }
+
+    protected void DebugLine(Vector3 from, Vector3 to, Color color, float duration = 0.5f)
+    {
+        if (drawDebugRays) Debug.DrawLine(from, to, color, duration);
     }
 
     protected void PlaySound(AudioClip clip)

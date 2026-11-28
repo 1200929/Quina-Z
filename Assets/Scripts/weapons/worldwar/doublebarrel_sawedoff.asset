@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: doublebarrel_sawedoff
   m_EditorClassIdentifier: Assembly-CSharp::FirearmData
   weaponName: Sawed-Off Shotgun
+  icon: {fileID: 21300000, guid: 6721ba2a3ec0a144b823e3dd56823509, type: 3}
   damage: 18
   impactForce: 500
   movementSpeedMultiplier: 1
@@ -44,10 +45,10 @@ MonoBehaviour:
   shellInsertTime: 0.5
   shellReloadEndTime: 0.4
   canFireInterruptReload: 1
-  spreadStationary: 20
-  spreadMoving: 50
+  spreadStationary: 12
+  spreadMoving: 35
   spreadWorsenTime: 0.05
-  spreadRecoverTime: 0.05
+  spreadRecoverTime: 0.01
   bloomPerShot: 2
   maxBloom: 4
   bloomRecovery: 10

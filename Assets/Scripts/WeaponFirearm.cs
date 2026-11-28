@@ -290,6 +290,7 @@ public class WeaponFirearm : Weapon
     {
         Vector3 origin = aimOrigin.position;
         Vector3 dir = ApplySpread(aimOrigin.rotation, spreadDegrees);
+        DebugLine(origin, origin + dir * data.range, Color.yellow); // where this shot is aimed (drawn on your machine)
 
         if (RunsOnServer)
             ServerFire(origin, dir);      // the host applies it directly
@@ -329,6 +330,7 @@ public class WeaponFirearm : Weapon
             {
                 RaycastHit hit = hitBuffer[i];
                 if (IsIgnored(hit.collider)) continue;
+                DebugLine(origin, hit.point, Color.red); // how far the bullet really got (drawn on the host)
 
                 float distance = travelled + hit.distance;
                 IDamageable target = FindDamageable(hit.collider);
@@ -353,6 +355,7 @@ public class WeaponFirearm : Weapon
 
                 if (!TryPassWall(hit, dir, out Vector3 exitPoint, out float thickness)) return;
 
+                DebugLine(hit.point, exitPoint, Color.green); // the part inside the wall
                 damageScale *= data.wallDamageRetained;
                 travelled = distance + thickness + 0.01f;
                 origin = exitPoint + dir * 0.01f;

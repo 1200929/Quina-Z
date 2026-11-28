@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: handcannon
   m_EditorClassIdentifier: Assembly-CSharp::FirearmData
   weaponName: Hand Cannon
+  icon: {fileID: 21300000, guid: 5a8497a2f44597949abe9759ea24dc0c, type: 3}
   damage: 8
   impactForce: 850
   movementSpeedMultiplier: 0.8
